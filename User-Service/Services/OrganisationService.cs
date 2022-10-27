@@ -32,31 +32,25 @@ public class OrganisationService
         return organization;
     }
 
-    public Organisation CreateOrganisation(string id, string name)
+    public Organisation CreateOrganisation(Organisation organisation)
     {
-        if (string.IsNullOrWhiteSpace(name))
-        {
-            throw new BadRequestException("Name cannot be empty.");
-        }
+        //if (string.IsNullOrWhiteSpace(name))
+        //{
+        //    throw new BadRequestException("Name cannot be empty.");
+        //}
 
-        if (string.IsNullOrWhiteSpace(id))
-        {
-            throw new BadRequestException("Id cannot be empty.");
-        }
+        //if (string.IsNullOrWhiteSpace(id))
+        //{
+        //    throw new BadRequestException("Id cannot be empty.");
+        //}
 
-        var organization = new Organisation()
-        {
-            Name = name,
-            Id = id
-        };
-
-        _unitOfWork.Organisations.Add(organization);
-        _natsService.Publish("organization-created", "", organization);
-        _natsService.Publish("th-logs", "", $"Organization created with ID: '{organization.Id}.'");
+        _unitOfWork.Organisations.Add(organisation);
+        _natsService.Publish("organization-created", "", organisation);
+        _natsService.Publish("th-logs", "", $"Organization created with ID: '{organisation.Id}.'");
 
         _unitOfWork.Complete();
 
-        return organization;
+        return organisation;
     }
 
     public Organisation UpdateOrganizationName(string id, string name)

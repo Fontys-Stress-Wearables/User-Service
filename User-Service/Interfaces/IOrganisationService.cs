@@ -8,7 +8,7 @@ namespace User_Service.Interfaces
 
         public Organisation GetOrganisation(string id);
 
-        public Organisation CreateOrganisation(string id, string name);
+        public Organisation CreateOrganisation(Organisation organisation);
 
         public Organisation UpdateOrganisationName(string id, string name);
 
