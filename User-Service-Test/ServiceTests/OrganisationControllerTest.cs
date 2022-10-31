@@ -10,11 +10,11 @@ using Xunit;
 
 namespace User_Service_Test.ServiceTests
 {
-    public class UnitTeUserControllerTestst1
+    public class OrganisationControllerTest
     {
         [Fact]
         // UnitOfWork_StateUnderTest_ExpectedBehaviour
-        public void GetOrganisationByID_WithUnexisitingItem_ReturnsNotFound ()
+        public void GetOrganisationByID_WithInexisitingOrganisation_ReturnsNotFound()
         {
             // Arrange
             // this is to create a fake instance of the organisation service class for testing
@@ -26,18 +26,18 @@ namespace User_Service_Test.ServiceTests
             // whenever the controller invokes GetOrganisationById method create any Guid for its arguement and return a null value
             serviceStub.Setup(service => service.GetOrganisationByID(It.IsAny<Guid>().ToString())).Returns((Organisation)null);
 
-            var loggerStub = new Mock<ILogger<UserController>>();
+            var loggerStub = new Mock<ILogger<OrganisationController>>();
 
-            var controller = new UserController(serviceStub.Object, loggerStub.Object);
+            var controller = new OrganisationController(serviceStub.Object, loggerStub.Object);
 
 
             // Act
-            var actualReult = controller.GetOrganisationByID(Guid.NewGuid().ToString());
+            var actualResult = controller.GetOrganisationByID(Guid.NewGuid().ToString());
 
             // Assert
             // actualReult.Result 
             // actual Result.Expected Result
-            Assert.IsType<NotFoundResult>(actualReult.Result);
+            Assert.IsType<NotFoundResult>(actualResult.Result);
         }
     }
 }

@@ -10,19 +10,18 @@ namespace User_Service.Controllers
     /// <summary>
     /// Property Controller
     /// </summary>
-    [Route("api/[controller]")]
+    [Route("organisations")]
     [ApiController]
-    public class UserController : ControllerBase
+    public class OrganisationController : ControllerBase
     {
         private readonly IOrganisationService _organisationService;
-        private readonly ILogger<UserController> logger;
-        public UserController(IOrganisationService organisationService, ILogger<UserController> logger)
+        private readonly ILogger<OrganisationController> logger;
+        public OrganisationController(IOrganisationService organisationService, ILogger<OrganisationController> logger)
         {
             _organisationService = organisationService;
             this.logger = logger;
         }
 
-        // get organisation by id
         [HttpGet("{id}")]
         public ActionResult<ReadOrganisationDto> GetOrganisationByID(string id)
         {
@@ -60,8 +59,6 @@ namespace User_Service.Controllers
         }
 
 
-
-        // update organisation 
         [HttpPut("updateorganisation/{id}")]
         public ReadOrganisationDto UpdateOrganisation(string id, UpdateOrganisationDto updateOrganisationDto)
         {
@@ -70,7 +67,7 @@ namespace User_Service.Controllers
             return organisationData.AsDto();
         }
 
-        // delete organisation
+
         [HttpDelete("deleteorganisation/{id}")]
         public void RemoveOrganisation(string id)
         {
