@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\mikos\\OneDrive\\Desktop\\Semester 6\\GroupPrj\\StressGroupGH\\User-Service\\User-Service\\User-Service.csproj": {}
+    "C:\\Users\\mikos\\OneDrive\\Desktop\\Semester6\\GroupProject\\User-Service\\User-Service\\User-Service.csproj": {}
   },
   "projects": {
-    "C:\\Users\\mikos\\OneDrive\\Desktop\\Semester 6\\GroupPrj\\StressGroupGH\\User-Service\\User-Service\\User-Service.csproj": {
+    "C:\\Users\\mikos\\OneDrive\\Desktop\\Semester6\\GroupProject\\User-Service\\User-Service\\User-Service.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\mikos\\OneDrive\\Desktop\\Semester 6\\GroupPrj\\StressGroupGH\\User-Service\\User-Service\\User-Service.csproj",
+        "projectUniqueName": "C:\\Users\\mikos\\OneDrive\\Desktop\\Semester6\\GroupProject\\User-Service\\User-Service\\User-Service.csproj",
         "projectName": "User-Service",
-        "projectPath": "C:\\Users\\mikos\\OneDrive\\Desktop\\Semester 6\\GroupPrj\\StressGroupGH\\User-Service\\User-Service\\User-Service.csproj",
+        "projectPath": "C:\\Users\\mikos\\OneDrive\\Desktop\\Semester6\\GroupProject\\User-Service\\User-Service\\User-Service.csproj",
         "packagesPath": "C:\\Users\\mikos\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\mikos\\OneDrive\\Desktop\\Semester 6\\GroupPrj\\StressGroupGH\\User-Service\\User-Service\\obj\\",
+        "outputPath": "C:\\Users\\mikos\\OneDrive\\Desktop\\Semester6\\GroupProject\\User-Service\\User-Service\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\mikos\\AppData\\Roaming\\NuGet\\NuGet.Config",
@@ -22,6 +22,7 @@
         ],
         "sources": {
           "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "C:\\Users\\mikos\\OneDrive\\Desktop\\Semester6\\Tutorial\\packages": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {

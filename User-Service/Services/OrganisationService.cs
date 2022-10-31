@@ -1,10 +1,11 @@
-﻿using User_Service.Exceptions;
+﻿using System.Runtime.CompilerServices;
+using User_Service.Exceptions;
 using User_Service.Interfaces;
 using User_Service.Models;
 
 namespace User_Service.Services;
 
-public class OrganisationService
+public class OrganisationService : IOrganisationService
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly INatsService _natsService;
@@ -18,9 +19,9 @@ public class OrganisationService
     public IEnumerable<Organisation> GetAll()
     {
         return _unitOfWork.Organisations.GetAll();
-    }
+    } 
 
-    public Organisation GetOrganization(string id)
+    public Organisation GetOrganisationByID(string id)
     {
         var organization = _unitOfWork.Organisations.GetById(id);
 
@@ -32,28 +33,17 @@ public class OrganisationService
         return organization;
     }
 
-    public Organisation CreateOrganisation(Organisation organisation)
+    public void CreateOrganisation(Organisation organisation)
     {
-        //if (string.IsNullOrWhiteSpace(name))
-        //{
-        //    throw new BadRequestException("Name cannot be empty.");
-        //}
-
-        //if (string.IsNullOrWhiteSpace(id))
-        //{
-        //    throw new BadRequestException("Id cannot be empty.");
-        //}
-
         _unitOfWork.Organisations.Add(organisation);
+
         _natsService.Publish("organization-created", "", organisation);
         _natsService.Publish("th-logs", "", $"Organization created with ID: '{organisation.Id}.'");
 
         _unitOfWork.Complete();
-
-        return organisation;
     }
-
-    public Organisation UpdateOrganizationName(string id, string name)
+    
+    public Organisation UpdateOrganisationName(string id, string name)
     {
         var organization = _unitOfWork.Organisations.GetById(id);
 
@@ -72,7 +62,7 @@ public class OrganisationService
         return organization;
     }
 
-    public void RemoveOrganization(string id)
+    public void RemoveOrganisation(string id)
     {
         var organization = _unitOfWork.Organisations.GetById(id);
 

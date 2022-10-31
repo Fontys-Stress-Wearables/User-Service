@@ -6,9 +6,9 @@ namespace User_Service.Interfaces
     {
         public IEnumerable<Organisation> GetAll();
 
-        public Organisation GetOrganisation(string id);
+        public Organisation GetOrganisationByID(string id);
 
-        public Organisation CreateOrganisation(Organisation organisation);
+        public void CreateOrganisation(Organisation organisation);
 
         public Organisation UpdateOrganisationName(string id, string name);
 

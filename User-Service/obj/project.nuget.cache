@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "OyXeqqmuhXou2Yjvc1wojBQ0JbhWIhMr+6WbLvyQxiw8eunJx/mAv+5VO8Zf4LTIkkJJpLBnf6cXCyL8bkVqWA==",
+  "dgSpecHash": "/3X0h8xN+zJ5FQGW1i5Zul6qNKYIP2/KsCmJ0DwTUBBd13lMk+hpmAymexxG47577eQfKnuao7UUJJr1im/8AA==",
   "success": true,
-  "projectFilePath": "C:\\Users\\mikos\\OneDrive\\Desktop\\Semester 6\\GroupPrj\\StressGroupGH\\User-Service\\User-Service\\User-Service.csproj",
+  "projectFilePath": "C:\\Users\\mikos\\OneDrive\\Desktop\\Semester6\\GroupProject\\User-Service\\User-Service\\User-Service.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\mikos\\.nuget\\packages\\automapper\\6.1.1\\automapper.6.1.1.nupkg.sha512",
     "C:\\Users\\mikos\\.nuget\\packages\\azure.core\\1.6.0\\azure.core.1.6.0.nupkg.sha512",
