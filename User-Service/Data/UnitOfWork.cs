@@ -10,9 +10,12 @@ namespace User_Service.Data
         {
             _context = context;
             Organisations = new OrganisationRepository(_context);
+            Users = new UserRepository(_context);
         }
 
         public IOrganisationRepository Organisations { get; }
+
+        public IUserRepository Users { get; }
 
         public void Dispose()
         {

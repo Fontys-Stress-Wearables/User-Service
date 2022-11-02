@@ -11,9 +11,12 @@ namespace User_Service.Data
 
         public DbSet<Organisation> Organization { get; set; }
 
+        public DbSet<User> User { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Organisation>().ToTable("Organisation");
+            modelBuilder.Entity<User>().ToTable("User");
         }
 
     }

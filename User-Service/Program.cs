@@ -19,6 +19,7 @@ builder.Services.AddTransient(typeof(IGenericRepository<>), typeof(GenericReposi
 builder.Services.AddTransient<IUnitOfWork, UnitOfWork>();
 
 builder.Services.AddTransient<IOrganisationService, OrganisationService>();
+builder.Services.AddTransient<IUserService, UserService>();
 builder.Services.AddTransient<INatsService, NatsService>();
 
 builder.Services.AddCors();
@@ -58,7 +59,7 @@ builder.Services.AddSwaggerGen(setup =>
 builder.Services.AddDbContext<DatabaseContext>(options =>
     options
         .UseLazyLoadingProxies()
-        .UseNpgsql(builder.Configuration.GetConnectionString("OrganisationContext") ?? string.Empty));
+        .UseNpgsql(builder.Configuration.GetConnectionString("UserServiceContext") ?? string.Empty));
 
 builder.Services.AddAutoMapper(typeof(Program));
 

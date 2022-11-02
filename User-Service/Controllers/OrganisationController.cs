@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
-using User_Service.Dtos;
+using User_Service.Dtos.OrganisationDto;
 using User_Service.Interfaces;
 using User_Service.Models;
 using User_Service.Services;
@@ -33,7 +33,7 @@ namespace User_Service.Controllers
                 return NotFound();
             }
 
-            return organisation.AsDto();
+            return organisation.AsOrganisationDto();
         }
 
         [HttpPost]
@@ -59,16 +59,16 @@ namespace User_Service.Controllers
         }
 
 
-        [HttpPut("updateorganisation/{id}")]
+        [HttpPut("update/{id}")]
         public ReadOrganisationDto UpdateOrganisation(string id, UpdateOrganisationDto updateOrganisationDto)
         {
             var organisationData = _organisationService.UpdateOrganisationName(id, updateOrganisationDto.Name);
 
-            return organisationData.AsDto();
+            return organisationData.AsOrganisationDto();
         }
 
 
-        [HttpDelete("deleteorganisation/{id}")]
+        [HttpDelete("delete/{id}")]
         public void RemoveOrganisation(string id)
         {
             _organisationService.RemoveOrganisation(id);

@@ -3,6 +3,7 @@
     public interface IUnitOfWork : IDisposable
     {
         IOrganisationRepository Organisations { get; }
+        IUserRepository Users { get; }
         int Complete();
     }
 }

@@ -8,7 +8,7 @@ using User_Service.Interfaces;
 using User_Service.Models;
 using Xunit;
 
-namespace User_Service_Test.ServiceTests
+namespace User_Service_Test.ServiceTests.ControllerTest
 {
     public class OrganisationControllerTest
     {

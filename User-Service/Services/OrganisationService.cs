@@ -10,11 +10,18 @@ public class OrganisationService : IOrganisationService
     private readonly IUnitOfWork _unitOfWork;
     private readonly INatsService _natsService;
 
+    // testing sake
+    //public OrganisationService(IUnitOfWork unitOfWork)
+    //{
+    //    _unitOfWork = unitOfWork;
+    //}
+
     public OrganisationService(IUnitOfWork unitOfWork, INatsService natsService)
     {
         _unitOfWork = unitOfWork;
         _natsService = natsService;
     }
+
 
     public IEnumerable<Organisation> GetAll()
     {
