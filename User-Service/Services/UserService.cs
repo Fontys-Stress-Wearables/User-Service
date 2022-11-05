@@ -1,5 +1,6 @@
 ﻿using User_Service.Exceptions;
 using User_Service.Interfaces;
+using User_Service.Interfaces.IServices;
 using User_Service.Models;
 
 namespace User_Service.Services
@@ -8,19 +9,19 @@ namespace User_Service.Services
     {
         // the unit of work service and interface implement the IuserRepo
         private readonly IUnitOfWork _unitOfWork;
-        private readonly INatsService _natsService;
+        //private readonly INatsService _natsService;
 
         // testing sake
-        //public UserService(IUnitOfWork _unitOfWork)
-        //{
-        //    this._unitOfWork = _unitOfWork;
-        //}
-
-        public UserService(IUnitOfWork _unitOfWork, INatsService _natsService)
+        public UserService(IUnitOfWork _unitOfWork)
         {
             this._unitOfWork = _unitOfWork;
-            this._natsService = _natsService;
         }
+
+        //public UserService(IUnitOfWork _unitOfWork, INatsService _natsService)
+        //{
+        //    this._unitOfWork = _unitOfWork;
+        //    this._natsService = _natsService;
+        //}
 
         public void AddUser(User user)
         {
@@ -39,8 +40,9 @@ namespace User_Service.Services
                 throw new BadRequestException("Birthdate cannot be after the current date.");
             }
             _unitOfWork.Users.Add(user);
-            _natsService.Publish("user-created", user.TenantId, user);
-            _natsService.Publish("th-logs", "", $"User created with ID: '{user.Id}.'");
+            _unitOfWork.Complete();
+            //_natsService.Publish("user-created", user.TenantId, user);
+            //_natsService.Publish("th-logs", "", $"User created with ID: '{user.Id}.'");
         }
 
         public IEnumerable<User> GetAll(string tenantId)
@@ -74,11 +76,10 @@ namespace User_Service.Services
             user.Birthdate = birthdate ?? user.Birthdate;
 
             _unitOfWork.Users.UpdateUserInDB(user);
-            _natsService.Publish("patient-updated", user.TenantId, user);
-            _natsService.Publish("th-logs", "", $"User updated with ID: '{user.Id}.'");
+            //_natsService.Publish("patient-updated", user.TenantId, user);
+            //_natsService.Publish("th-logs", "", $"User updated with ID: '{user.Id}.'");
 
             _unitOfWork.Complete();
-
             return user;
         }
     }

@@ -1,5 +1,6 @@
 ﻿using User_Service.Dtos.OrganisationDto;
 using User_Service.Dtos.PatientDto;
+using User_Service.Dtos.PatientGroupDto;
 using User_Service.Models;
 
 namespace User_Service
@@ -11,7 +12,7 @@ namespace User_Service
             return new ReadOrganisationDto
             {
                 Id = organisation.Id,
-                Name = organisation.Name,
+                Name = organisation.Name
             };
         }
 
@@ -24,6 +25,16 @@ namespace User_Service
                 LastName = user.LastName,
                 Birthdate = user.Birthdate,
                 IsActive = user.IsActive
+            };
+        }
+
+        public static ReadPatientGroupDto AsPatientGroupDto(this PatientGroup patientGroup)
+        {
+            return new ReadPatientGroupDto
+            {
+                Id = patientGroup.Id,
+                GroupName = patientGroup.GroupName,
+                Description = patientGroup.Description
             };
         }
 

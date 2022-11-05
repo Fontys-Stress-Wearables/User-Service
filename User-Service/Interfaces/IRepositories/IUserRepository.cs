@@ -1,6 +1,6 @@
 ﻿using User_Service.Models;
 
-namespace User_Service.Interfaces
+namespace User_Service.Interfaces.IRepositories
 {
     public interface IUserRepository : IGenericRepository<User>
     {

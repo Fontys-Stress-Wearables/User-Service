@@ -1,7 +1,8 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using User_Service.Dtos.OrganisationDto;
-using User_Service.Interfaces;
+using User_Service.Dtos.PatientGroupDto;
+using User_Service.Interfaces.IServices;
 using User_Service.Models;
 using User_Service.Services;
 
@@ -34,6 +35,23 @@ namespace User_Service.Controllers
             }
 
             return organisation.AsOrganisationDto();
+        }
+
+        [HttpGet("patientgroups/{id}")]
+        public ActionResult<IEnumerable<ReadPatientGroupDto>> GetOrganisationPatientGroupsByID(string id)
+        {
+            logger.LogInformation($"Getting an Organisation by the {id}");
+            var organisation = _organisationService.GetOrganisationByID(id);
+
+            if (organisation is null)
+            {
+                return NotFound();
+            }
+
+            var patientGroups = organisation.PatientGroups
+                .Select(item => item.AsPatientGroupDto());
+
+           return Ok(patientGroups);
         }
 
         [HttpPost]

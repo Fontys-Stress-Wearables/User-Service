@@ -1,4 +1,5 @@
 ﻿using User_Service.Interfaces;
+using User_Service.Interfaces.IRepositories;
 
 namespace User_Service.Data
 {
@@ -11,11 +12,14 @@ namespace User_Service.Data
             _context = context;
             Organisations = new OrganisationRepository(_context);
             Users = new UserRepository(_context);
+            PatientGroups = new PatientGroupRepository(_context);
         }
 
         public IOrganisationRepository Organisations { get; }
 
         public IUserRepository Users { get; }
+
+        public IPatientGroupRepository PatientGroups { get; }
 
         public void Dispose()
         {

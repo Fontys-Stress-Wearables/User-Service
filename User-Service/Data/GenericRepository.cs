@@ -1,4 +1,4 @@
-﻿using User_Service.Interfaces;
+﻿using User_Service.Interfaces.IRepositories;
 
 namespace User_Service.Data
 {

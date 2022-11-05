@@ -1,7 +1,7 @@
 ﻿using NATS.Client;
 using Newtonsoft.Json;
 using System.Text;
-using User_Service.Interfaces;
+using User_Service.Interfaces.IServices;
 using User_Service.Models;
 
 namespace User_Service.Services

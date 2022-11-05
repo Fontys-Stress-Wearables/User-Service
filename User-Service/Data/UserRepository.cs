@@ -1,4 +1,4 @@
-﻿using User_Service.Interfaces;
+﻿using User_Service.Interfaces.IRepositories;
 using User_Service.Models;
 
 namespace User_Service.Data
@@ -13,13 +13,13 @@ namespace User_Service.Data
         // get all the patients under this tenant id 
         public IEnumerable<User> GetAllByTenant(string tenantId)
         {
-            return _context.Set<User>().Where(x => x.TenantId == tenantId).ToList();
+            return _context.Set<User>().Where(x => x.Organisation.Id == tenantId).ToList();
         }
 
 
         public User GetByIdAndTenant(string tenantId, string patientId)
         {
-            return _context.Set<User>().Where(x => x.TenantId == tenantId).FirstOrDefault(x => x.Id == patientId);
+            return _context.Set<User>().Where(x => x.Organisation.Id == tenantId).FirstOrDefault(x => x.Id == patientId);
         }
 
         public User UpdateUserInDB(User patient)

@@ -7,6 +7,8 @@
         public string LastName { get; set; } 
         public DateTime Birthdate { get; set; }
         public bool IsActive { get; set; }
-        public string TenantId { get; set; }
+        public virtual Organisation Organisation { get; set; }
+        public string Role { get; set; }
+        public virtual PatientGroup PatientGroup { get; set; }
     }
 }

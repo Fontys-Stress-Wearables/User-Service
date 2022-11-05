@@ -13,10 +13,13 @@ namespace User_Service.Data
 
         public DbSet<User> User { get; set; }
 
+        public DbSet<PatientGroup> PatientGroups { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Organisation>().ToTable("Organisation");
             modelBuilder.Entity<User>().ToTable("User");
+            modelBuilder.Entity<PatientGroup>().ToTable("PatientGroup");
         }
 
     }
