@@ -29,5 +29,6 @@ namespace User_Service.Interfaces.IServices
         public IEnumerable<PatientGroup> GetForPatient(string userId, string tenantId);
         public IEnumerable<PatientGroup> GetForCareGivers(string userId, string tenantId);
         public void Delete(string id, string tenantId);
+        public void RemoveUserFromPatientGroup(string patientGroupId, string userId, string tenantId);
     }
 }

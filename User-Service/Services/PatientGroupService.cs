@@ -102,7 +102,7 @@ namespace User_Service.Services
 
             var user = _userService.GetUser(tenantId, userId);
 
-             _unitOfWork.PatientGroups.AddUser(patientGroup, user);
+            _unitOfWork.PatientGroups.AddUser(patientGroup, user);
 
             //_natsService.Publish("user-added-to-patientgroup", user.Id, patientGroup);
             _unitOfWork.Complete();
@@ -132,14 +132,48 @@ namespace User_Service.Services
 
         public void Delete(string id, string tenantId)
         {
-            throw new NotImplementedException();
-        }
+            var group = _unitOfWork.PatientGroups.GetByIdAndTenant(id, tenantId);
 
+            if(group == null)
+            {
+                throw new NotFoundException($"Patient group with id '{id}' doesn't exist.");
+            }
+
+            //_natsService.Publish("patient-group-removed", tenantId, group);
+            //_natsService.Publish("th-logs", "", $"Patient-Group removed with ID: '{id}.'");
+            _unitOfWork.PatientGroups.Remove(group);
+            _unitOfWork.Complete();
+        }
 
 
         public PatientGroup Update(string patientGroupId, string? name, string? description, string tenantId)
         {
-            throw new NotImplementedException();
+            var group = _unitOfWork.PatientGroups.GetByIdAndTenant(patientGroupId, tenantId);
+
+            if (group == null)
+            {
+                throw new NotFoundException($"Patient group with id '{patientGroupId}' doesn't exist.");
+            }
+
+            if (name != null) group.GroupName = name;
+            if (description != null) group.Description = description;
+
+            var updated = _unitOfWork.PatientGroups.Update(group);
+
+            //_natsService.Publish("patient-group-updated", tenantId, updated);
+            //_natsService.Publish("th-logs", "", $"Patient-Group updated with ID: '{updated.Id}.'");
+            _unitOfWork.Complete();
+
+            return updated;
+        }
+
+        public void RemoveUserFromPatientGroup(string patientGroupId, string userId, string tenantId)
+        {
+            var patientGroup = GetPatientGroupByIdandTenant(patientGroupId, tenantId);
+
+            var userModel = _userService.GetUser(tenantId, userId);
+            _unitOfWork.PatientGroups.RemoveUser(patientGroup, userModel);
+            _unitOfWork.Complete();
         }
     }
 }

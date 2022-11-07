@@ -29,9 +29,10 @@ namespace User_Service.Data
             return _context.Set<PatientGroup>().Where(x => x.Organisation.Id == tenantId).FirstOrDefault(x => x.Id == id);
         }
 
-        public void RemoveUser(User user)
+        public void RemoveUser(PatientGroup patientGroup, User user)
         {
-            throw new NotImplementedException();
+            patientGroup.Users.Remove(user);
+            _context.Update(patientGroup);
         }
     }
 }

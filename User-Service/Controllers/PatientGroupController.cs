@@ -80,7 +80,7 @@ namespace User_Service.Controllers
             return CreatedAtAction(nameof(GetPatientGroupById), new { patientGroupID = patientGroup.Id }, $"{patientGroup.GroupName} Added");
         }
 
-        [HttpPost("{patientGroupID}/users")]
+        [HttpPost("{patientGroupID}/user")]
         public async Task PostUserToPatientGroup(string patientGroupID, [FromBody] string userId )
         {
             //await _patientGroupService.AddUserToPatientGroup(patientGroupID, userId, HttpContext.User.GetTenantId()!);
@@ -111,6 +111,31 @@ namespace User_Service.Controllers
             return groups;
         }
 
+
+        [HttpDelete("{id}")]
+        public void DeletePatientGroup(string id)
+        {
+            //_patientGroupService.Delete(id, HttpContext.User.GetTenantId()!);
+
+            _patientGroupService.Delete(id, "1358d9d3-b805-4ec3-a0ee-cdd35864e8ba");
+        }
+
+        [HttpPut("{id}")]
+        public ReadPatientGroupDto UpdatePatientGroup(string id, [FromBody] UpdatePatientGroupDto patientGroup)
+        {
+            //var updatedGroup = _patientGroupService.Update(id, patientGroup.GroupName, patientGroup.Description, HttpContext.User.GetTenantId()!);
+
+            var updatedGroup = _patientGroupService.Update(id, patientGroup.GroupName, patientGroup.Description, "1358d9d3-b805-4ec3-a0ee-cdd35864e8ba");
+
+            return updatedGroup.AsPatientGroupDto();
+        }
+
+        [HttpDelete("{id}/user")]
+        public void RemovePatientFromPatientGroup(string id, [FromBody] string userId)
+        {
+            //_patientGroupService.RemoveUserFromPatientGroup(id, userId, HttpContext.User.GetTenantId()!);
+            _patientGroupService.RemoveUserFromPatientGroup(id, userId, "1358d9d3-b805-4ec3-a0ee-cdd35864e8ba");
+        }
 
     }
 }

@@ -11,6 +11,6 @@ namespace User_Service.Interfaces.IRepositories
 
         public void AddUser(PatientGroup patientGroup, User user);
 
-        public void RemoveUser(User user);
+        public void RemoveUser(PatientGroup patientGroup, User user);
     }
 }
