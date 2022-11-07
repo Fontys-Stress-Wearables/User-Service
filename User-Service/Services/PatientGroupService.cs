@@ -72,11 +72,10 @@ namespace User_Service.Services
             var patientGroup = GetPatientGroupByIdandTenant(patientGroupId, tenantId);
             foreach (var item in patientGroup.Users)
             {
-                if(item.Role != "Patient")
+                if(item.Role == "Patient")
                 {
-                    throw new NotFoundException($"No patients found");
+                    patientsInPatientGroup.Add(item);
                 }
-                patientsInPatientGroup.Add(item);
             }
             return patientsInPatientGroup;
         }
@@ -87,11 +86,10 @@ namespace User_Service.Services
             var patientGroup = GetPatientGroupByIdandTenant(patientGroupId, tenantId);
             foreach (var item in patientGroup.Users)
             {
-                if (item.Role != "Caregiver")
+                if (item.Role == "Caregiver")
                 {
-                    throw new NotFoundException($"No caregivers found");
+                    caregiversInPatientGroup.Add(item);
                 }
-                caregiversInPatientGroup.Add(item);
             }
             return caregiversInPatientGroup;
         }

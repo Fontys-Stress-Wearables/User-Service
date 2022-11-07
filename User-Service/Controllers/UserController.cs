@@ -74,7 +74,8 @@ namespace User_Service.Controllers
         [HttpPut("updates/{id}")]
         public ReadUserDto UpdateUser(string id, UpdateUserDto updateUserDto)
         {
-            var userData = userService.UpdateUser(HttpContext.User.GetTenantId()!,id, updateUserDto.FirstName, updateUserDto.LastName, updateUserDto.Birthdate);
+            //var userData = userService.UpdateUser(HttpContext.User.GetTenantId()!,id, updateUserDto.FirstName, updateUserDto.LastName, updateUserDto.Birthdate);
+            var userData = userService.UpdateUser("1358d9d3-b805-4ec3-a0ee-cdd35864e8ba", id, updateUserDto.FirstName, updateUserDto.LastName, updateUserDto.Birthdate);
 
             return userData.AsUserDto();
         }
