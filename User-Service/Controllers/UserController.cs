@@ -67,7 +67,8 @@ namespace User_Service.Controllers
                 Role = createUserDto.Role
             };
             userService.AddUser(userModel);
-            return CreatedAtAction(nameof(GetUsersById), new { id = userModel.Id }, userModel);
+
+            return CreatedAtAction(nameof(GetUsersById), new { id = userModel.Id }, $"{userModel.FirstName} {userModel.LastName} Added");
         }
 
         [HttpPut("updates/{id}")]

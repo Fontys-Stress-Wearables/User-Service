@@ -1,4 +1,7 @@
-﻿namespace User_Service.Models
+﻿using System.ComponentModel.DataAnnotations.Schema;
+using System.Data;
+
+namespace User_Service.Models
 {
     public class User
     {
@@ -9,6 +12,6 @@
         public bool IsActive { get; set; }
         public virtual Organisation Organisation { get; set; }
         public string Role { get; set; }
-        public virtual PatientGroup PatientGroup { get; set; }
+        public virtual List<PatientGroup> PatientGroups { get; set; }
     }
 }
