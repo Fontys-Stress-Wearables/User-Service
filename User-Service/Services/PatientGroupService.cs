@@ -7,12 +7,14 @@ namespace User_Service.Services
 {
     public class PatientGroupService : IPatientGroupService
     {
+        private readonly IUserService _userService;
         private readonly IUnitOfWork _unitOfWork;
         //private readonly INatsService _natsService;
 
-        public PatientGroupService(IUnitOfWork _unitOfWork)
+        public PatientGroupService(IUnitOfWork _unitOfWork, IUserService userService)
         {
             this._unitOfWork = _unitOfWork;
+            _userService = userService;
         }
 
         //public PatientGroupService(IUnitOfWork _unitOfWork, INatsService natsService)
@@ -23,7 +25,7 @@ namespace User_Service.Services
 
         public PatientGroup GetPatientGroupByIdandTenant(string patientGroupId, string tenantId)
         {
-            var patientGroup = _unitOfWork.PatientGroups.GetByIdAndTenant(tenantId, patientGroupId);
+            var patientGroup = _unitOfWork.PatientGroups.GetByIdAndTenant(patientGroupId, tenantId);
 
             if (patientGroup == null)
             {
@@ -32,6 +34,7 @@ namespace User_Service.Services
 
             return patientGroup;
         }
+
 
         public PatientGroup Create(string name, string? description, string tenantId)
         {
@@ -61,6 +64,70 @@ namespace User_Service.Services
             //_natsService.Publish("th-logs", "", $"Patient-Group created with ID: '{patientGroup.Id}.'");
             _unitOfWork.Complete();
             return patientGroup;
+        }
+
+        public List<User> GetAllPatientsInPatientGroup(string patientGroupId, string tenantId)
+        {
+            List<User> patientsInPatientGroup = new List<User>();
+            var patientGroup = GetPatientGroupByIdandTenant(patientGroupId, tenantId);
+            foreach (var item in patientGroup.Users)
+            {
+                if(item.Role != "Patient")
+                {
+                    throw new NotFoundException($"No patients found");
+                }
+                patientsInPatientGroup.Add(item);
+            }
+            return patientsInPatientGroup;
+        }
+
+        public List<User> GetAllCaregiversInPatientGroup(string patientGroupId, string tenantId)
+        {
+            List<User> caregiversInPatientGroup = new List<User>();
+            var patientGroup = GetPatientGroupByIdandTenant(patientGroupId, tenantId);
+            foreach (var item in patientGroup.Users)
+            {
+                if (item.Role != "Caregiver")
+                {
+                    throw new NotFoundException($"No caregivers found");
+                }
+                caregiversInPatientGroup.Add(item);
+            }
+            return caregiversInPatientGroup;
+        }
+
+        public async Task AddUserToPatientGroup(string patientGroupId, string userId, string tenantId)
+        {
+            var patientGroup = GetPatientGroupByIdandTenant(patientGroupId, tenantId);
+
+            var user = _userService.GetUser(tenantId, userId);
+
+             _unitOfWork.PatientGroups.AddUser(patientGroup, user);
+
+            //_natsService.Publish("user-added-to-patientgroup", user.Id, patientGroup);
+            _unitOfWork.Complete();
+        }
+
+        public IEnumerable<PatientGroup> GetForPatient(string userId, string tenantId)
+        {
+            var patient = _userService.GetUser(tenantId, userId);
+            if(patient.Role != "Patient")
+            {
+                throw new NotFoundException($"The Id inputted does not belong to a patient");
+            }
+            var patientGroups = patient.PatientGroups;
+            return patientGroups;
+        }
+
+        public IEnumerable<PatientGroup> GetForCareGivers(string userId, string tenantId)
+        {
+            var carerGiver = _userService.GetUser(tenantId, userId);
+            if (carerGiver.Role != "Caregiver")
+            {
+                throw new NotFoundException($"The Id inputted does not belong to a caregiver");
+            }
+            var patientGroups = carerGiver.PatientGroups;
+            return patientGroups;
         }
 
         public void Delete(string id, string tenantId)

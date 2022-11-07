@@ -10,14 +10,17 @@ namespace User_Service.Data
 
         }
 
+        // return all patient groups in this organisation
         public IEnumerable<PatientGroup> GetAllFromTenant(string tenantId)
         {
-            throw new NotImplementedException();
+            return _context.Set<PatientGroup>().Where(x => x.Organisation.Id == tenantId).ToList();
         }
 
         public void AddUser(PatientGroup patientGroup, User user)
         {
-            
+            patientGroup.Users.Add(user);
+
+            _context.PatientGroups.Update(patientGroup);
         }
 
 

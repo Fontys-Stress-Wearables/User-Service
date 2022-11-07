@@ -23,6 +23,11 @@ namespace User_Service.Interfaces.IServices
 
         //public IEnumerable<Caregiver> GetCaregivers(string id, string tenantId);
         //public Task<IEnumerable<PatientGroup>> GetForCaregiver(string caregiverId, string tenantId);
+        public Task AddUserToPatientGroup(string patientGroupId, string userId, string tenantId);
+        public List<User> GetAllCaregiversInPatientGroup(string patientGroupId, string tenantId);
+        public List<User> GetAllPatientsInPatientGroup(string patientGroupId, string tenantId);
+        public IEnumerable<PatientGroup> GetForPatient(string userId, string tenantId);
+        public IEnumerable<PatientGroup> GetForCareGivers(string userId, string tenantId);
         public void Delete(string id, string tenantId);
     }
 }

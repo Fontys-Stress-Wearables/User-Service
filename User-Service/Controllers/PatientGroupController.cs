@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Logging;
 using Microsoft.Identity.Web;
 using User_Service.Dtos.OrganisationDto;
+using User_Service.Dtos.PatientDto;
 using User_Service.Dtos.PatientGroupDto;
 using User_Service.Interfaces.IServices;
 using User_Service.Models;
@@ -20,7 +21,7 @@ namespace User_Service.Controllers
             this._patientGroupService = patientGroupService;
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("{patientGroupID}")]
         public ActionResult<ReadPatientGroupDto> GetPatientGroupById(string patientGroupID)
         {
             //var patientGroup = _patientGroupService.GetPatientGroupByIdandTenant(patientGroupID, HttpContext.User.GetTenantId());
@@ -32,6 +33,36 @@ namespace User_Service.Controllers
             }
 
             return patientGroup.AsPatientGroupDto();
+        }
+
+        [HttpGet("{patientGroupID}/patients")]
+        public ActionResult<IEnumerable<ReadUserDto>> GetAllPatientsInPatientGroup(string patientGroupID)
+        {
+            //var patientGroup = _patientGroupService.GetAllPatientsInPatientGroup(patientGroupID, HttpContext.User.GetTenantId());
+            var usersInPatientGroup = _patientGroupService.GetAllPatientsInPatientGroup(patientGroupID, "1358d9d3-b805-4ec3-a0ee-cdd35864e8ba");
+
+            if (usersInPatientGroup is null)
+            {
+                return NotFound();
+            }
+            var patients = usersInPatientGroup
+                .Select(item => item.AsUserDto());
+            return Ok(patients);
+        }
+
+        [HttpGet("{patientGroupID}/caregivers")]
+        public ActionResult<IEnumerable<ReadUserDto>> GetAllCaregiversInPatientGroup(string patientGroupID)
+        {
+            //var patientGroup = _patientGroupService.GetAllPatientsInPatientGroup(patientGroupID, HttpContext.User.GetTenantId());
+            var usersInPatientGroup = _patientGroupService.GetAllCaregiversInPatientGroup(patientGroupID, "1358d9d3-b805-4ec3-a0ee-cdd35864e8ba");
+
+            if (usersInPatientGroup is null)
+            {
+                return NotFound();
+            }
+            var caregivers = usersInPatientGroup
+                .Select(item => item.AsUserDto());
+            return Ok(caregivers);
         }
 
         [HttpPost]
@@ -46,7 +77,40 @@ namespace User_Service.Controllers
 
             // if the item is created its Id will be gotten back
             // https;//localhost:7113/items/{id of created item}
-            return CreatedAtAction(nameof(GetPatientGroupById), new { id = patientGroup.Id }, patientGroup.GroupName + "Added");
+            return CreatedAtAction(nameof(GetPatientGroupById), new { patientGroupID = patientGroup.Id }, $"{patientGroup.GroupName} Added");
         }
+
+        [HttpPost("{patientGroupID}/users")]
+        public async Task PostUserToPatientGroup(string patientGroupID, [FromBody] string userId )
+        {
+            //await _patientGroupService.AddUserToPatientGroup(patientGroupID, userId, HttpContext.User.GetTenantId()!);
+
+            await _patientGroupService.AddUserToPatientGroup(patientGroupID, userId, "1358d9d3-b805-4ec3-a0ee-cdd35864e8ba");
+        }
+
+
+        // all patient groups a patient is in
+        [HttpGet("patients/{userId}")]
+        public IEnumerable<ReadPatientGroupDto> GetPatientPatientGroups(string userId)
+        {
+            //var groups = _patientGroupService.GetForPatient(id, HttpContext.User.GetTenantId()!);
+
+            var groups = _patientGroupService.GetForPatient(userId, "1358d9d3-b805-4ec3-a0ee-cdd35864e8ba")
+                .Select(patientGroup => patientGroup.AsPatientGroupDto());
+            return groups; 
+        }
+
+        // all patient groups a patient is in
+        [HttpGet("caregivers/{userId}")]
+        public IEnumerable<ReadPatientGroupDto> GetCaregiverPatientGroups(string userId)
+        {
+            //var groups = _patientGroupService.GetForPatient(id, HttpContext.User.GetTenantId()!);
+
+            var groups = _patientGroupService.GetForCareGivers(userId, "1358d9d3-b805-4ec3-a0ee-cdd35864e8ba")
+                .Select(patientGroup => patientGroup.AsPatientGroupDto());
+            return groups;
+        }
+
+
     }
 }
