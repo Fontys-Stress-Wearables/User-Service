@@ -27,16 +27,11 @@ public class OrganisationService : IOrganisationService
     public IEnumerable<Organisation> GetAll()
     {
         return _unitOfWork.Organisations.GetAll();
-    } 
+    }
 
     public Organisation GetOrganisationByID(string id)
     {
         var organization = _unitOfWork.Organisations.GetById(id);
-
-        if (organization == null)
-        {
-            throw new NotFoundException($"Organization with id '{id}' doesn't exist.");
-        }
 
         return organization;
     }
@@ -50,15 +45,10 @@ public class OrganisationService : IOrganisationService
 
         _unitOfWork.Complete();
     }
-    
+
     public Organisation UpdateOrganisationName(string id, string name)
     {
         var organisation = _unitOfWork.Organisations.GetById(id);
-
-        if (organisation == null)
-        {
-            throw new NotFoundException($"Organization with id '{id}' doesn't exist.");
-        }
 
         organisation.Name = name;
         _unitOfWork.Organisations.Update(organisation);
@@ -73,11 +63,6 @@ public class OrganisationService : IOrganisationService
     public void RemoveOrganisation(string id)
     {
         var organization = _unitOfWork.Organisations.GetById(id);
-
-        if (organization == null)
-        {
-            throw new NotFoundException($"Organization with id '{id}' doesn't exist.");
-        }
 
         _unitOfWork.Organisations.Remove(organization);
         //_natsService.Publish("organization-removed", "", organization);
