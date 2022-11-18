@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Identity.Web;
 using User_Service.Dtos.OrganisationDto;
@@ -9,6 +10,7 @@ using User_Service.Services;
 
 namespace User_Service.Controllers
 {
+    [Authorize]
     [Route("users")]
     [ApiController]
     public class UserController : ControllerBase
@@ -22,28 +24,20 @@ namespace User_Service.Controllers
             this.organisationService = organisationService;
         }
 
+        [Authorize(Roles = "Organization.Admin")]
         [HttpGet]
         public ActionResult<IEnumerable<ReadUserDto>> GetAllUsers()
         {
-            //var users = userService.GetAll(HttpContext.User.GetTenantId()!)
-            //            .Select(item => item.AsUserDto());
-            //return Ok(users);
-
-            // -----------Use this if authentication isnt fixed -------------------
-            var users = userService.GetAll("1358d9d3-b805-4ec3-a0ee-cdd35864e8ba")
-            .Select(item => item.AsUserDto());
+            var users = userService.GetAll(HttpContext.User.GetTenantId()!)
+                        .Select(item => item.AsUserDto());
             return Ok(users);
-            // ---------------------------------------------------------------------
         }
 
+        [Authorize(Roles = "Organization.Admin, Organization.Caregiver")]
         [HttpGet("{id}")]
         public ActionResult<ReadUserDto> GetUsersById(string id)
         {
-            //var user = userService.GetUser(HttpContext.User.GetTenantId(), Id);
-
-            // -----------Use this if authentication isnt fixed -------------------
-            var user = userService.GetUser("1358d9d3-b805-4ec3-a0ee-cdd35864e8ba", id);
-            // ---------------------------------------------------------------------
+            var user = userService.GetUser(HttpContext.User.GetTenantId(), id);
 
             if (user is null)
             {
@@ -52,6 +46,7 @@ namespace User_Service.Controllers
             return user.AsUserDto();
         }
 
+        [Authorize(Roles = "Organization.Admin")]
         [HttpPost]
         public ActionResult<ReadUserDto> PostUser(CreateUserDto createUserDto)
         {
@@ -62,8 +57,7 @@ namespace User_Service.Controllers
                 Birthdate = createUserDto.Birthdate,
                 IsActive = true,
                 Id = Guid.NewGuid().ToString(),
-                //Organisation = organisationService.GetOrganisationByID(HttpContext.User.GetTenantId()),
-                Organisation = organisationService.GetOrganisationByID("1358d9d3-b805-4ec3-a0ee-cdd35864e8ba"),
+                Organisation = organisationService.GetOrganisationByID(HttpContext.User.GetTenantId()),
                 Role = createUserDto.Role
             };
             userService.AddUser(userModel);
@@ -71,12 +65,11 @@ namespace User_Service.Controllers
             return CreatedAtAction(nameof(GetUsersById), new { id = userModel.Id }, $"{userModel.Role} {userModel.FirstName} {userModel.LastName} Added");
         }
 
+        [Authorize(Roles = "Organization.Admin, Organization.Caregiver")]
         [HttpPut("updates/{id}")]
         public ReadUserDto UpdateUser(string id, UpdateUserDto updateUserDto)
         {
-            //var userData = userService.UpdateUser(HttpContext.User.GetTenantId()!,id, updateUserDto.FirstName, updateUserDto.LastName, updateUserDto.Birthdate);
-            var userData = userService.UpdateUser("1358d9d3-b805-4ec3-a0ee-cdd35864e8ba", id, updateUserDto.FirstName, updateUserDto.LastName, updateUserDto.Birthdate);
-
+            var userData = userService.UpdateUser(HttpContext.User.GetTenantId()!, id, updateUserDto.FirstName, updateUserDto.LastName, updateUserDto.Birthdate);
             return userData.AsUserDto();
         }
     }

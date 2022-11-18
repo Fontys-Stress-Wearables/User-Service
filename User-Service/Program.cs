@@ -13,50 +13,63 @@ using User_Service.Services;
 var builder = WebApplication.CreateBuilder(args);
 
 //---------Comment out if you want to run without authentication-------------
-//builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-//    .AddMicrosoftIdentityWebApi(builder.Configuration.GetSection("AzureAd"));
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddMicrosoftIdentityWebApi(builder.Configuration.GetSection("AzureAd"));
 //---------------------------------------------------------------------------
+
+// authorization for organization admin
+builder.Services.AddAuthorization(policies =>
+{
+    policies.AddPolicy("caregiver", p =>
+    {
+        p.RequireRole("Organization.Caregiver");
+    });
+    policies.AddPolicy("organization-admin", p =>
+    {
+        p.RequireRole("Organization.Admin");
+    });
+    
+});
 
 builder.Services.AddTransient(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 builder.Services.AddTransient<IUnitOfWork, UnitOfWork>();
-
 builder.Services.AddTransient<IOrganisationService, OrganisationService>();
 builder.Services.AddTransient<IUserService, UserService>();
 builder.Services.AddTransient<IPatientGroupService, PatientGroupService>();
 builder.Services.AddTransient<INatsService, NatsService>();
 
 builder.Services.AddCors();
-builder.Services.AddControllers();
-
+builder.Services.AddControllers().AddNewtonsoftJson(options =>
+            options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
+        );
 builder.Services.AddEndpointsApiExplorer();
 
 builder.Services.AddSwaggerGen();
-
 //---------Comment out if you want to run without authentication-------------
-//builder.Services.AddSwaggerGen(setup =>
-//{
-//    var jwtSecurityScheme = new OpenApiSecurityScheme
-//    {
-//        Scheme = "bearer",
-//        BearerFormat = "JWT",
-//        Name = "Authentication",
-//        In = ParameterLocation.Header,
-//        Type = SecuritySchemeType.Http,
+builder.Services.AddSwaggerGen(setup =>
+{
+    var jwtSecurityScheme = new OpenApiSecurityScheme
+    {
+        Scheme = "bearer",
+        BearerFormat = "JWT",
+        Name = "Authentication",
+        In = ParameterLocation.Header,
+        Type = SecuritySchemeType.Http,
 
-//        Reference = new OpenApiReference
-//        {
-//            Id = JwtBearerDefaults.AuthenticationScheme,
-//            Type = ReferenceType.SecurityScheme
-//        }
-//    };
+        Reference = new OpenApiReference
+        {
+            Id = JwtBearerDefaults.AuthenticationScheme,
+            Type = ReferenceType.SecurityScheme
+        }
+    };
 
-//    setup.AddSecurityDefinition(jwtSecurityScheme.Reference.Id, jwtSecurityScheme);
+    setup.AddSecurityDefinition(jwtSecurityScheme.Reference.Id, jwtSecurityScheme);
 
-//    setup.AddSecurityRequirement(new OpenApiSecurityRequirement
-//    {
-//        { jwtSecurityScheme, Array.Empty<string>() }
-//    });
-//});
+    setup.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        { jwtSecurityScheme, Array.Empty<string>() }
+    });
+});
 //-------------------------------------------------------------------------------
 
 builder.Services.AddDbContext<DatabaseContext>(options =>
@@ -83,17 +96,15 @@ using (var scope = app.Services.CreateScope())
 }
 
 app.UseHttpsRedirection();
+//----Comment out if you want to run without authentication----
+app.UseAuthentication();
+//-------------------------------------------------------------
+app.UseAuthorization();
 
 app.UseCors(c => c.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin());
 
 //----Comment out if you want to run without authentication----
-//app.UseAuthentication();
-//-------------------------------------------------------------
-
-app.UseAuthorization();
-
-//----Comment out if you want to run without authentication----
-//app.UseOrganizationAuthorization();
+app.UseOrganizationAuthorization();
 //-------------------------------------------------------------
 
 app.MapControllers();

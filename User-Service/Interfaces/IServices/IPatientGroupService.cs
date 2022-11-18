@@ -16,7 +16,7 @@ namespace User_Service.Interfaces.IServices
         //public Task AddCaregiver(string patientGroupId, string caregiverId, string tenantId);
         //public Task RemoveCaregiver(string patientGroupId, string caregiverId, string tenantId);
 
-        //public IEnumerable<PatientGroup> GetAll(string tenantId);
+        public IEnumerable<PatientGroup> GetAll(string tenantId);
 
         //public IEnumerable<Patient> GetPatients(string id, string tenantId);
         //public IEnumerable<PatientGroup> GetForPatient(string patientId, string tenantId);

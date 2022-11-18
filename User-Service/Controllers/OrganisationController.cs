@@ -1,7 +1,10 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Collections.Generic;
 using User_Service.Dtos.OrganisationDto;
 using User_Service.Dtos.PatientGroupDto;
+using User_Service.Exceptions;
 using User_Service.Interfaces.IServices;
 using User_Service.Models;
 using User_Service.Services;
@@ -11,27 +14,44 @@ namespace User_Service.Controllers
     /// <summary>
     /// Property Controller
     /// </summary>
+    [Authorize]
     [Route("organisations")]
     [ApiController]
     public class OrganisationController : ControllerBase
     {
         private readonly IOrganisationService _organisationService;
         private readonly ILogger<OrganisationController> logger;
+
         public OrganisationController(IOrganisationService organisationService, ILogger<OrganisationController> logger)
         {
             _organisationService = organisationService;
             this.logger = logger;
         }
 
+        [HttpGet("/organisations")]
+        public ActionResult<IEnumerable<Organisation>> GetOrganizations()
+        {
+            var organisations = _organisationService.GetAll();
+
+            if (organisations != null)
+            {
+                return Ok(organisations.AsOrganisationsDto());
+            }
+
+            return NotFound("No organistions found");
+
+        }
+
         [HttpGet("{id}")]
         public ActionResult<ReadOrganisationDto> GetOrganisationByID(string id)
         {
             logger.LogInformation($"Getting an Organisation by the {id}");
+
             var organisation = _organisationService.GetOrganisationByID(id);
 
             if(organisation is null)
             {
-                return NotFound();
+                return NotFound($"An organisation with the Id:'{id}' does not exist.");
             }
 
             return organisation.AsOrganisationDto();
@@ -55,8 +75,20 @@ namespace User_Service.Controllers
         }
 
         [HttpPost]
+        [ProducesResponseType(typeof(ReadOrganisationDto), 200)]
+        [ProducesResponseType(400)]
         public ActionResult<ReadOrganisationDto> PostOrganisation(CreateOrganisationDto createOrganisationDTO)
         {
+
+            if (string.IsNullOrWhiteSpace(createOrganisationDTO.Name))
+            {
+                return BadRequest($"Organisation name cannot be empty.");
+            }
+
+            if (string.IsNullOrWhiteSpace(createOrganisationDTO.Id))
+            {
+                return BadRequest($"Organisation Id cannot be empty.");
+            }
             // creating a new item entity
             // by storing the createdItemDTO as the properties created in the Item class
             var organisationModel = new Organisation
@@ -64,6 +96,19 @@ namespace User_Service.Controllers
                 Id = createOrganisationDTO.Id,
                 Name = createOrganisationDTO.Name
             };
+
+            var organisations = _organisationService.GetAll();
+
+            if (organisations.Any())
+            {
+                foreach (var organisation in organisations)
+                {
+                    if (organisationModel.Id == organisation.Id)
+                    {
+                        return BadRequest($"Organisation with Id:'{organisationModel.Id}' already exists.");
+                    }
+                }
+            }
 
             logger.LogInformation($"Organisation {organisationModel.Name} being created ...");
 
@@ -76,20 +121,37 @@ namespace User_Service.Controllers
             return CreatedAtAction(nameof(GetOrganisationByID), new { id = organisationModel.Id }, organisationModel);
         }
 
-
         [HttpPut("update/{id}")]
-        public ReadOrganisationDto UpdateOrganisation(string id, UpdateOrganisationDto updateOrganisationDto)
+        public ActionResult<ReadOrganisationDto> UpdateOrganisation(string id, UpdateOrganisationDto updateOrganisationDto)
         {
+            if (string.IsNullOrWhiteSpace(updateOrganisationDto.Name))
+            {
+                return BadRequest($"Organisation name cannot be empty.");
+            }
+
             var organisationData = _organisationService.UpdateOrganisationName(id, updateOrganisationDto.Name);
+
+            if (organisationData is null)
+            {
+                return BadRequest($"Organisation with Id:'{id}' does not exist.");
+            }
 
             return organisationData.AsOrganisationDto();
         }
 
-
         [HttpDelete("delete/{id}")]
-        public void RemoveOrganisation(string id)
+        public ActionResult<HttpResponse> RemoveOrganisation(string id)
         {
+            var organisation = _organisationService.GetOrganisationByID(id);
+
+            if (organisation is null)
+            {
+                return BadRequest($"Organisation with Id:'{id}' does not exist.");
+            }
+
             _organisationService.RemoveOrganisation(id);
+
+            return Ok($"Organisation with Id:'{id}' has been deleted.");
         }
     }
 }

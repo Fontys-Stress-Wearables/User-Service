@@ -1,4 +1,5 @@
-﻿using User_Service.Dtos.OrganisationDto;
+﻿using System.Collections.Generic;
+using User_Service.Dtos.OrganisationDto;
 using User_Service.Dtos.PatientDto;
 using User_Service.Dtos.PatientGroupDto;
 using User_Service.Models;
@@ -7,6 +8,17 @@ namespace User_Service
 {
     public static class Extensions
     {
+
+        public static IEnumerable<ReadOrganisationDto> AsOrganisationsDto(this IEnumerable<Organisation> organisations)
+        {
+            var organisationsDto = new List<ReadOrganisationDto>();
+            foreach (var organistation in organisations)
+            {
+                organisationsDto.Add(organistation.AsOrganisationDto());
+            }
+            return organisationsDto;
+        }
+
         public static ReadOrganisationDto AsOrganisationDto(this Organisation organisation)
         {
             return new ReadOrganisationDto

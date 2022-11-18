@@ -173,5 +173,13 @@ namespace User_Service.Services
             _unitOfWork.PatientGroups.RemoveUser(patientGroup, userModel);
             _unitOfWork.Complete();
         }
+
+        public IEnumerable<PatientGroup> GetAll(string tenantId)
+        {
+            var patientGroups = _unitOfWork.PatientGroups.GetAllFromTenant(tenantId);
+
+
+            return patientGroups;
+        }
     }
 }
