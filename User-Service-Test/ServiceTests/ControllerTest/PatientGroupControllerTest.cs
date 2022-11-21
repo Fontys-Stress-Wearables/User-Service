@@ -1,10 +1,12 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Identity.Web;
 using Moq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using User_Service.Controllers;
@@ -29,30 +31,62 @@ namespace User_Service_Test.ServiceTests.ControllerTest
 
         private string organisationId = "1358d9d3-b805-4ec3-a0ee-cdd35864e8ba";
 
+
+
         [Fact]
         // UnitOfWork_StateUnderTest_ExpectedBehaviour
         public void GetPatientGroupByID_ReturnsPatientGroup()
         {
             // Arrange 
-            var context = new DefaultHttpContext();
-            context.Request.Headers["Tenant-ID"] = organisationId;
+            var user = new ClaimsPrincipal(new ClaimsIdentity(new Claim[] {
+                                        new Claim(ClaimTypes.NameIdentifier, Guid.NewGuid().ToString()),
+                                        new Claim(ClaimTypes.Name, "gunnar@somecompany.com"),
+                                        new Claim("http://schemas.microsoft.com/identity/claims/tenantid", organisationId)
+                                        // other required and custom claims
+                                   }, "TestAuthentication"));
+
+            //Mock IHttpContextAccessor
+             var mockHttpContextAccessor = new Mock<IHttpContextAccessor>();
+            var context = new DefaultHttpContext { User = user };
+            var fakeTenantId = organisationId;
+            mockHttpContextAccessor.Setup(_ => _.HttpContext).Returns(context);
+
             var expectedPatientGroup = CreateRandomPatientGroup();
-            var expectedOrganisation = CreateRandomOrganisation();
-            var patientGroupController = new PatientGroupController(patientGroupServiceStub.Object, httpContextStub.Object);
 
-            httpContextStub.Setup(http => http.HttpContext).Returns(context);
-
-            patientGroupServiceStub.Setup(service => service.GetPatientGroupByIdandTenant(expectedPatientGroup.Id, organisationId))
+            patientGroupServiceStub.Setup(
+                service => service.GetPatientGroupByIdandTenant(expectedPatientGroup.Id, fakeTenantId))
                 .Returns(expectedPatientGroup);
+
+            var patientGroupController = new PatientGroupController(patientGroupServiceStub.Object, mockHttpContextAccessor.Object);
 
             // Act           
             var result = patientGroupController.GetPatientGroupById(expectedPatientGroup.Id);
 
             // Assert
             var actualResult = Assert.IsType<ActionResult<ReadPatientGroupDto>>(result);
-            var patietGroup = Assert.IsType<ReadPatientGroupDto>(actualResult.Value);
-            Assert.Equal("Ward-A", patietGroup.GroupName);
+            var patientGroup = Assert.IsType<ReadPatientGroupDto>(actualResult.Value);
+            Assert.Equal("Ward-A", patientGroup.GroupName);
         }
+
+        //[Fact]
+        //public void Index_should_return_private_view_for_authenticated_user()
+        //{
+        //    var logger = new NullLogger<HomeController>();
+        //    var user = new ClaimsPrincipal(new ClaimsIdentity(new Claim[] {
+        //                                new Claim(ClaimTypes.NameIdentifier, organisationId),
+        //                                new Claim(ClaimTypes.Name, "gunnar@somecompany.com")
+        //                                // other required and custom claims
+        //                           }, "TestAuthentication"));
+        //    user.Claims.
+        //    var controller = new HomeController(logger);
+        //    controller.ControllerContext = new ControllerContext();
+        //    controller.ControllerContext.HttpContext = new DefaultHttpContext { User = user };
+
+        //    var result = controller.Index() as ViewResult;
+        //    var viewName = result.ViewName;
+
+        //    Assert.True(string.IsNullOrEmpty(viewName) || viewName == "Index");
+        //}
 
         //[Fact]
         //// UnitOfWork_StateUnderTest_ExpectedBehaviour
