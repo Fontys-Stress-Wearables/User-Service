@@ -17,29 +17,29 @@ namespace User_Service.Controllers
     [Route("patientgroups")]
     public class PatientGroupController : ControllerBase
     {
-        private string tenantID;
-        private IHeaderConfiguration headerConfiguration;
+        private string _tenantId;
         private IPatientGroupService _patientGroupService;
-        private IHttpContextAccessor httpContextAccessor;
+        private IHttpContextAccessor _httpContextAccessor;
 
         public PatientGroupController(IPatientGroupService patientGroupService, IHttpContextAccessor httpContextAccessor, IHeaderConfiguration headerConfiguration)
         {
-            this.httpContextAccessor = httpContextAccessor;
-            this._patientGroupService = patientGroupService;
-            this.httpContextAccessor = httpContextAccessor;
-            tenantID = headerConfiguration.GetTenantId(httpContextAccessor);
+            _httpContextAccessor = httpContextAccessor;
+            _patientGroupService = patientGroupService;
+            
+            _tenantId = headerConfiguration.GetTenantId(_httpContextAccessor);
+
         }
 
         [Authorize(Roles = "Organization.Admin")]
         [HttpGet("/patientGroups")]
         public ActionResult<IEnumerable<PatientGroup>> GetAllPatientGroups()
         {
-            var patientGroups = _patientGroupService.GetAll(tenantID);
+            var patientGroups = _patientGroupService.GetAll(_tenantId);
             //var patientGroup = _patientGroupService.GetPatientGroupByIdandTenant(patientGroupID, "1358d9d3-b805-4ec3-a0ee-cdd35864e8ba");
 
             if (patientGroups is null)
             {
-                return NotFound($"No patient groups found for tenantId:'{tenantID}'");
+                return NotFound($"No patient groups found for tenantId:'{_tenantId}'");
             }
 
             return Ok(patientGroups);
@@ -49,8 +49,7 @@ namespace User_Service.Controllers
         [HttpGet("{patientGroupID}")]
         public ActionResult<ReadPatientGroupDto> GetPatientGroupById(string patientGroupID)
         {
-            var patientGroup = _patientGroupService.GetPatientGroupByIdandTenant(patientGroupID, tenantID);
-            //var patientGroup = _patientGroupService.GetPatientGroupByIdandTenant(patientGroupID, "1358d9d3-b805-4ec3-a0ee-cdd35864e8ba");
+            var patientGroup = _patientGroupService.GetPatientGroupByIdandTenant(patientGroupID, _tenantId);
 
             if (patientGroup is null)
             {
@@ -64,7 +63,7 @@ namespace User_Service.Controllers
         [HttpGet("{patientGroupID}/patients")]
         public ActionResult<IEnumerable<ReadUserDto>> GetAllPatientsInPatientGroup(string patientGroupID)
         {
-            var usersInPatientGroup = _patientGroupService.GetAllPatientsInPatientGroup(patientGroupID, httpContextAccessor.HttpContext.User.GetTenantId());
+            var usersInPatientGroup = _patientGroupService.GetAllPatientsInPatientGroup(patientGroupID, _httpContextAccessor.HttpContext.User.GetTenantId());
             //var usersInPatientGroup = _patientGroupService.GetAllPatientsInPatientGroup(patientGroupID, "1358d9d3-b805-4ec3-a0ee-cdd35864e8ba");
 
             if (usersInPatientGroup is null)
@@ -80,7 +79,7 @@ namespace User_Service.Controllers
         [HttpGet("{patientGroupID}/caregivers")]
         public ActionResult<IEnumerable<ReadUserDto>> GetAllCaregiversInPatientGroup(string patientGroupID)
         {
-            var usersInPatientGroup = _patientGroupService.GetAllCaregiversInPatientGroup(patientGroupID, httpContextAccessor.HttpContext.User.GetTenantId());
+            var usersInPatientGroup = _patientGroupService.GetAllCaregiversInPatientGroup(patientGroupID, _httpContextAccessor.HttpContext.User.GetTenantId());
             //var usersInPatientGroup = _patientGroupService.GetAllCaregiversInPatientGroup(patientGroupID, "1358d9d3-b805-4ec3-a0ee-cdd35864e8ba");
 
             if (usersInPatientGroup is null)
@@ -96,7 +95,7 @@ namespace User_Service.Controllers
         [HttpPost]
         public ActionResult<ReadPatientGroupDto> PostPatientGroup(CreatePatientGroupDto createPatientGroupDto)
         {
-            var patientGroup = _patientGroupService.Create(createPatientGroupDto.GroupName, createPatientGroupDto.Description, httpContextAccessor.HttpContext.User.GetTenantId()!);
+            var patientGroup = _patientGroupService.Create(createPatientGroupDto.GroupName, createPatientGroupDto.Description, _httpContextAccessor.HttpContext.User.GetTenantId()!);
 
             //var patientGroup = _patientGroupService.Create(createPatientGroupDto.GroupName, createPatientGroupDto.Description, "1358d9d3-b805-4ec3-a0ee-cdd35864e8ba");
 
@@ -112,7 +111,7 @@ namespace User_Service.Controllers
         [HttpPost("{patientGroupID}/user")]
         public async Task PostUserToPatientGroup(string patientGroupID, [FromBody] string userId )
         {
-            await _patientGroupService.AddUserToPatientGroup(patientGroupID, userId, httpContextAccessor.HttpContext.User.GetTenantId()!);
+            await _patientGroupService.AddUserToPatientGroup(patientGroupID, userId, _httpContextAccessor.HttpContext.User.GetTenantId()!);
 
             //await _patientGroupService.AddUserToPatientGroup(patientGroupID, userId, "1358d9d3-b805-4ec3-a0ee-cdd35864e8ba");
         }
@@ -123,7 +122,7 @@ namespace User_Service.Controllers
         [HttpGet("patients/{userId}")]
         public IEnumerable<ReadPatientGroupDto> GetPatientPatientGroups(string userId)
         {
-            var groups = _patientGroupService.GetForPatient(userId, httpContextAccessor.HttpContext.User.GetTenantId()!)
+            var groups = _patientGroupService.GetForPatient(userId, _httpContextAccessor.HttpContext.User.GetTenantId()!)
                 .Select(patientGroup => patientGroup.AsPatientGroupDto()); 
 
             //var groups = _patientGroupService.GetForPatient(userId, "1358d9d3-b805-4ec3-a0ee-cdd35864e8ba")
@@ -136,7 +135,7 @@ namespace User_Service.Controllers
         [HttpGet("caregivers/{userId}")]
         public IEnumerable<ReadPatientGroupDto> GetCaregiverPatientGroups(string userId)
         {
-            var groups = _patientGroupService.GetForCareGivers(userId, httpContextAccessor.HttpContext.User.GetTenantId()!)
+            var groups = _patientGroupService.GetForCareGivers(userId, _httpContextAccessor.HttpContext.User.GetTenantId()!)
                 .Select(patientGroup => patientGroup.AsPatientGroupDto());
 
             //var groups = _patientGroupService.GetForCareGivers(userId, "1358d9d3-b805-4ec3-a0ee-cdd35864e8ba")
@@ -148,7 +147,7 @@ namespace User_Service.Controllers
         [HttpDelete("{id}")]
         public void DeletePatientGroup(string id)
         {
-            _patientGroupService.Delete(id, httpContextAccessor.HttpContext.User.GetTenantId()!);
+            _patientGroupService.Delete(id, _httpContextAccessor.HttpContext.User.GetTenantId()!);
 
             //_patientGroupService.Delete(id, "1358d9d3-b805-4ec3-a0ee-cdd35864e8ba");
         }
@@ -157,7 +156,7 @@ namespace User_Service.Controllers
         [HttpPut("{id}")]
         public ReadPatientGroupDto UpdatePatientGroup(string id, [FromBody] UpdatePatientGroupDto patientGroup)
         {
-            var updatedGroup = _patientGroupService.Update(id, patientGroup.GroupName, patientGroup.Description, httpContextAccessor.HttpContext.User.GetTenantId()!);
+            var updatedGroup = _patientGroupService.Update(id, patientGroup.GroupName, patientGroup.Description, _httpContextAccessor.HttpContext.User.GetTenantId()!);
 
             //var updatedGroup = _patientGroupService.Update(id, patientGroup.GroupName, patientGroup.Description, "1358d9d3-b805-4ec3-a0ee-cdd35864e8ba");
 
@@ -168,7 +167,7 @@ namespace User_Service.Controllers
         [HttpDelete("{id}/user")]
         public void RemovePatientFromPatientGroup(string id, [FromBody] string userId)
         {
-            _patientGroupService.RemoveUserFromPatientGroup(id, userId, httpContextAccessor.HttpContext.User.GetTenantId()!);
+            _patientGroupService.RemoveUserFromPatientGroup(id, userId, _httpContextAccessor.HttpContext.User.GetTenantId()!);
             //_patientGroupService.RemoveUserFromPatientGroup(id, userId, "1358d9d3-b805-4ec3-a0ee-cdd35864e8ba");
         }
 
