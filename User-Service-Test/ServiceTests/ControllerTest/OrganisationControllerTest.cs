@@ -4,11 +4,11 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Moq;
 using User_Service.Controllers;
-using User_Service.Interfaces;
+using User_Service.Interfaces.IServices;
 using User_Service.Models;
 using Xunit;
 
-namespace User_Service_Test.ServiceTests
+namespace User_Service_Test.ServiceTests.ControllerTest
 {
     public class OrganisationControllerTest
     {

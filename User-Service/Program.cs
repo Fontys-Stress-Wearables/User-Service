@@ -5,6 +5,8 @@ using Microsoft.Identity.Web;
 using Microsoft.OpenApi.Models;
 using User_Service.Data;
 using User_Service.Interfaces;
+using User_Service.Interfaces.IRepositories;
+using User_Service.Interfaces.IServices;
 using User_Service.Middlewares;
 using User_Service.Services;
 
@@ -15,19 +17,34 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddMicrosoftIdentityWebApi(builder.Configuration.GetSection("AzureAd"));
 //---------------------------------------------------------------------------
 
+// authorization for organization admin
+builder.Services.AddAuthorization(policies =>
+{
+    policies.AddPolicy("caregiver", p =>
+    {
+        p.RequireRole("Organization.Caregiver");
+    });
+    policies.AddPolicy("organization-admin", p =>
+    {
+        p.RequireRole("Organization.Admin");
+    });
+    
+});
+
 builder.Services.AddTransient(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 builder.Services.AddTransient<IUnitOfWork, UnitOfWork>();
-
 builder.Services.AddTransient<IOrganisationService, OrganisationService>();
+builder.Services.AddTransient<IUserService, UserService>();
+builder.Services.AddTransient<IPatientGroupService, PatientGroupService>();
 builder.Services.AddTransient<INatsService, NatsService>();
 
 builder.Services.AddCors();
-builder.Services.AddControllers();
-
+builder.Services.AddControllers().AddNewtonsoftJson(options =>
+            options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
+        );
 builder.Services.AddEndpointsApiExplorer();
 
 builder.Services.AddSwaggerGen();
-
 //---------Comment out if you want to run without authentication-------------
 builder.Services.AddSwaggerGen(setup =>
 {
@@ -58,7 +75,7 @@ builder.Services.AddSwaggerGen(setup =>
 builder.Services.AddDbContext<DatabaseContext>(options =>
     options
         .UseLazyLoadingProxies()
-        .UseNpgsql(builder.Configuration.GetConnectionString("OrganisationContext") ?? string.Empty));
+        .UseNpgsql(builder.Configuration.GetConnectionString("UserServiceContext") ?? string.Empty));
 
 builder.Services.AddAutoMapper(typeof(Program));
 
@@ -79,14 +96,12 @@ using (var scope = app.Services.CreateScope())
 }
 
 app.UseHttpsRedirection();
-
-app.UseCors(c => c.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin());
-
 //----Comment out if you want to run without authentication----
 app.UseAuthentication();
 //-------------------------------------------------------------
-
 app.UseAuthorization();
+
+app.UseCors(c => c.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin());
 
 //----Comment out if you want to run without authentication----
 app.UseOrganizationAuthorization();

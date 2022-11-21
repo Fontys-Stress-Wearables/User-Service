@@ -1,6 +1,6 @@
 ﻿using NATS.Client;
 
-namespace User_Service.Interfaces;
+namespace User_Service.Interfaces.IServices;
 
 public interface INatsService
 {

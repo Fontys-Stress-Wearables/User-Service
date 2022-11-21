@@ -23,10 +23,10 @@ public class OrganisationAuthorisationMiddleware
             throw new NotFoundException("tenant not found");
         }
 
-        if (tenant != _configuration["tenant"])
-        {
-            throw new UnauthorizedException("tenant not found");
-        }
+        //if (!organizationService.Exists(tenant))
+        //{
+        //    throw new UnauthorizedException("tenant not found");
+        //}
 
         await _next(context);
     }

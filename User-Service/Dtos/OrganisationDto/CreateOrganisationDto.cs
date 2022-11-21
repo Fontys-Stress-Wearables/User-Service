@@ -1,4 +1,4 @@
-﻿namespace User_Service.Dtos
+﻿namespace User_Service.Dtos.OrganisationDto
 {
     public class CreateOrganisationDto
     {
