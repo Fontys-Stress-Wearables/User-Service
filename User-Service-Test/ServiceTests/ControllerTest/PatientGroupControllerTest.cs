@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Identity.Web;
 using Moq;
 using System;
 using System.Collections.Generic;
@@ -37,12 +38,9 @@ namespace User_Service_Test.ServiceTests.ControllerTest
             context.Request.Headers["Tenant-ID"] = organisationId;
             var expectedPatientGroup = CreateRandomPatientGroup();
             var expectedOrganisation = CreateRandomOrganisation();
-            var patientGroupController = new PatientGroupController(patientGroupServiceStub.Object, httpContextStub.Object, headerConfigStub.Object);
+            var patientGroupController = new PatientGroupController(patientGroupServiceStub.Object, httpContextStub.Object);
 
             httpContextStub.Setup(http => http.HttpContext).Returns(context);
-
-            headerConfigStub.Setup(x => x.GetTenantId(It.IsAny<IHttpContextAccessor>()))
-                .Returns(organisationId);
 
             patientGroupServiceStub.Setup(service => service.GetPatientGroupByIdandTenant(expectedPatientGroup.Id, organisationId))
                 .Returns(expectedPatientGroup);

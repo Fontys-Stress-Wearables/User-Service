@@ -5,7 +5,6 @@ using Microsoft.Identity.Web;
 using User_Service.Dtos.OrganisationDto;
 using User_Service.Dtos.PatientDto;
 using User_Service.Dtos.PatientGroupDto;
-using User_Service.Interfaces;
 using User_Service.Interfaces.IServices;
 using User_Service.Models;
 using User_Service.Services;
@@ -17,29 +16,25 @@ namespace User_Service.Controllers
     [Route("patientgroups")]
     public class PatientGroupController : ControllerBase
     {
-        private string tenantID;
-        private IHeaderConfiguration headerConfiguration;
         private IPatientGroupService _patientGroupService;
-        private IHttpContextAccessor httpContextAccessor;
+        private readonly IHttpContextAccessor httpContextAccessor;
 
-        public PatientGroupController(IPatientGroupService patientGroupService, IHttpContextAccessor httpContextAccessor, IHeaderConfiguration headerConfiguration)
+        public PatientGroupController(IPatientGroupService patientGroupService, IHttpContextAccessor httpContextAccessor)
         {
-            this.httpContextAccessor = httpContextAccessor;
             this._patientGroupService = patientGroupService;
             this.httpContextAccessor = httpContextAccessor;
-            tenantID = headerConfiguration.GetTenantId(httpContextAccessor);
         }
 
         [Authorize(Roles = "Organization.Admin")]
         [HttpGet("/patientGroups")]
         public ActionResult<IEnumerable<PatientGroup>> GetAllPatientGroups()
         {
-            var patientGroups = _patientGroupService.GetAll(tenantID);
+            var patientGroups = _patientGroupService.GetAll(httpContextAccessor.HttpContext.User.GetTenantId());
             //var patientGroup = _patientGroupService.GetPatientGroupByIdandTenant(patientGroupID, "1358d9d3-b805-4ec3-a0ee-cdd35864e8ba");
 
             if (patientGroups is null)
             {
-                return NotFound($"No patient groups found for tenantId:'{tenantID}'");
+                return NotFound($"No patient groups found for tenantId:'{httpContextAccessor.HttpContext.User.GetTenantId()}'");
             }
 
             return Ok(patientGroups);
@@ -49,7 +44,7 @@ namespace User_Service.Controllers
         [HttpGet("{patientGroupID}")]
         public ActionResult<ReadPatientGroupDto> GetPatientGroupById(string patientGroupID)
         {
-            var patientGroup = _patientGroupService.GetPatientGroupByIdandTenant(patientGroupID, tenantID);
+            var patientGroup = _patientGroupService.GetPatientGroupByIdandTenant(patientGroupID, httpContextAccessor.HttpContext.User.GetTenantId());
             //var patientGroup = _patientGroupService.GetPatientGroupByIdandTenant(patientGroupID, "1358d9d3-b805-4ec3-a0ee-cdd35864e8ba");
 
             if (patientGroup is null)
