@@ -21,38 +21,64 @@ namespace User_Service_Test.ServiceTests.ControllerTest
 {
     public  class PatientGroupControllerTest
     {
+        // PostUserToPatientGroup, DeletePatientGroup and RemovePatientFromPatientGroup methods not yet tested
+        // due to no return and response values
+
         private readonly Mock<IOrganisationService> organisationServiceStub = new Mock<IOrganisationService>();
 
         private readonly Mock<IUserService> userServiceStub = new Mock<IUserService>();
 
         private readonly Mock<IPatientGroupService> patientGroupServiceStub = new Mock<IPatientGroupService>();
-        private readonly Mock<IHttpContextAccessor> httpContextStub = new Mock<IHttpContextAccessor>();
-        private readonly Mock<IHeaderConfiguration> headerConfigStub = new Mock<IHeaderConfiguration>();
+        private readonly Mock<IHttpContextAccessor> mockHttpContextAccessor = new Mock<IHttpContextAccessor>();
 
         private string organisationId = "1358d9d3-b805-4ec3-a0ee-cdd35864e8ba";
 
 
+        [Fact]
+        // UnitOfWork_StateUnderTest_ExpectedBehaviour
+        public void GetAllPatientsInPatientGroup_ReturnsAllPatients()
+        {
+            // Arrange 
+            var user = GenerateAuthenticatedUser();
+
+            //Mock IHttpContextAccessor
+            var context = new DefaultHttpContext { User = user };
+            var fakeTenantId = organisationId;
+            mockHttpContextAccessor.Setup(_ => _.HttpContext).Returns(context);
+
+            //Mock IPatientGroupService
+            var expectedPatients = CreateRandomPatients();
+            var expectedPatientGroup = CreateRandomPatientGroup();
+            var expectedOrganisation = CreateRandomOrganisation();
+            patientGroupServiceStub.Setup(service => service.GetAllCaregiversInPatientGroup(expectedPatientGroup.Id, expectedOrganisation.Id))
+                .Returns(expectedPatients);
+
+            var patientGroupController = new PatientGroupController(patientGroupServiceStub.Object, mockHttpContextAccessor.Object);
+
+            // Act
+            var result = patientGroupController.GetAllCaregiversInPatientGroup(expectedPatientGroup.Id);
+
+            // Assert
+            var actualResult = Assert.IsType<ActionResult<IEnumerable<ReadUserDto>>>(result);
+            var okResult = Assert.IsType<OkObjectResult>(actualResult.Result);
+            Assert.Equal(200, okResult.StatusCode);
+        }
 
         [Fact]
         // UnitOfWork_StateUnderTest_ExpectedBehaviour
         public void GetPatientGroupByID_ReturnsPatientGroup()
         {
             // Arrange 
-            var user = new ClaimsPrincipal(new ClaimsIdentity(new Claim[] {
-                                        new Claim(ClaimTypes.NameIdentifier, Guid.NewGuid().ToString()),
-                                        new Claim(ClaimTypes.Name, "gunnar@somecompany.com"),
-                                        new Claim("http://schemas.microsoft.com/identity/claims/tenantid", organisationId)
-                                        // other required and custom claims
-                                   }, "TestAuthentication"));
+            var user = GenerateAuthenticatedUser();
 
             //Mock IHttpContextAccessor
-             var mockHttpContextAccessor = new Mock<IHttpContextAccessor>();
             var context = new DefaultHttpContext { User = user };
             var fakeTenantId = organisationId;
             mockHttpContextAccessor.Setup(_ => _.HttpContext).Returns(context);
 
-            var expectedPatientGroup = CreateRandomPatientGroup();
 
+            //Mock IPatientGroupService
+            var expectedPatientGroup = CreateRandomPatientGroup();
             patientGroupServiceStub.Setup(
                 service => service.GetPatientGroupByIdandTenant(expectedPatientGroup.Id, fakeTenantId))
                 .Returns(expectedPatientGroup);
@@ -68,113 +94,94 @@ namespace User_Service_Test.ServiceTests.ControllerTest
             Assert.Equal("Ward-A", patientGroup.GroupName);
         }
 
-        //[Fact]
-        //public void Index_should_return_private_view_for_authenticated_user()
-        //{
-        //    var logger = new NullLogger<HomeController>();
-        //    var user = new ClaimsPrincipal(new ClaimsIdentity(new Claim[] {
-        //                                new Claim(ClaimTypes.NameIdentifier, organisationId),
-        //                                new Claim(ClaimTypes.Name, "gunnar@somecompany.com")
-        //                                // other required and custom claims
-        //                           }, "TestAuthentication"));
-        //    user.Claims.
-        //    var controller = new HomeController(logger);
-        //    controller.ControllerContext = new ControllerContext();
-        //    controller.ControllerContext.HttpContext = new DefaultHttpContext { User = user };
+        [Fact]
+        // UnitOfWork_StateUnderTest_ExpectedBehaviour
+        public void GetAllCareGiversInPatientGroup_ReturnsAllCaregviers()
+        {
+            // Arrange 
+            var user = GenerateAuthenticatedUser();
 
-        //    var result = controller.Index() as ViewResult;
-        //    var viewName = result.ViewName;
+            //Mock IHttpContextAccessor
+            var context = new DefaultHttpContext { User = user };
+            var fakeTenantId = organisationId;
+            mockHttpContextAccessor.Setup(_ => _.HttpContext).Returns(context);
 
-        //    Assert.True(string.IsNullOrEmpty(viewName) || viewName == "Index");
-        //}
+            //Mock IPatientGroupService
+            var expectedCaregivers = CreateRandomCaregivers();
+            var expectedPatientGroup = CreateRandomPatientGroup();
+            var expectedOrganisation = CreateRandomOrganisation();
+            patientGroupServiceStub.Setup(service => service.GetAllCaregiversInPatientGroup(expectedPatientGroup.Id, expectedOrganisation.Id))
+                .Returns(expectedCaregivers);
 
-        //[Fact]
-        //// UnitOfWork_StateUnderTest_ExpectedBehaviour
-        //public void GetAllPatientsInPatientGroup_ReturnsAllPatients()
-        //{
-        //    // Arrange 
-        //    var expectedPatients = CreateRandomPatients();
-        //    var expectedPatientGroup = CreateRandomPatientGroup();
-        //    var expectedOrganisation = CreateRandomOrganisation();
-        //    var patientGroupController = new PatientGroupController(patientGroupServiceStub.Object, httpContextStub.Object);
+            var patientGroupController = new PatientGroupController(patientGroupServiceStub.Object, mockHttpContextAccessor.Object);
 
-        //    patientGroupServiceStub.Setup(service => service.GetAllCaregiversInPatientGroup(expectedPatientGroup.Id, expectedOrganisation.Id))
-        //        .Returns(expectedPatients);
+            // Act           
+            var result = patientGroupController.GetAllCaregiversInPatientGroup(expectedPatientGroup.Id);
 
-        //    // Act           
-        //    var result = patientGroupController.GetAllCaregiversInPatientGroup(expectedPatientGroup.Id);
+            // Assert
+            var actualResult = Assert.IsType<ActionResult<IEnumerable<ReadUserDto>>>(result);
+            var okResult = Assert.IsType<OkObjectResult>(actualResult.Result);
+            Assert.Equal(200, okResult.StatusCode);
+        }
 
-        //    // Assert
-        //    var actualResult = Assert.IsType<ActionResult<IEnumerable<ReadUserDto>>>(result);
-        //    var okResult = Assert.IsType<OkObjectResult>(actualResult.Result);
-        //    Assert.Equal(200, okResult.StatusCode);
-        //}
+        [Fact]
+        // UnitOfWork_StateUnderTest_ExpectedBehaviour
+        public void PostPatientGroup_WithPatientGroupToCreate_ReturnsCreatedString()
+        {
+            // Arrange 
+            var user = GenerateAuthenticatedUser();
 
-        //[Fact]
-        //// UnitOfWork_StateUnderTest_ExpectedBehaviour
-        //public void GetAllCareGiversInPatientGroup_ReturnsAllCaregviers()
-        //{
-        //    // Arrange 
-        //    var expectedCaregivers = CreateRandomCaregivers();
-        //    var expectedPatientGroup = CreateRandomPatientGroup();
-        //    var expectedOrganisation = CreateRandomOrganisation();
-        //    var patientGroupController = new PatientGroupController(patientGroupServiceStub.Object, httpContextStub.Object);
+            //Mock IHttpContextAccessor
+            var context = new DefaultHttpContext { User = user };
+            var fakeTenantId = organisationId;
+            mockHttpContextAccessor.Setup(_ => _.HttpContext).Returns(context);
 
-        //    patientGroupServiceStub.Setup(service => service.GetAllCaregiversInPatientGroup(expectedPatientGroup.Id, expectedOrganisation.Id))
-        //        .Returns(expectedCaregivers);
+            //Mock IPatientGroupService
+            var expectedPatientGroup = CreateRandomPatientGroup();
 
-        //    // Act           
-        //    var result = patientGroupController.GetAllCaregiversInPatientGroup(expectedPatientGroup.Id);
+            patientGroupServiceStub.Setup(service => service.Create("Ward-A", "Dementia group", "1358d9d3-b805-4ec3-a0ee-cdd35864e8ba"))
+                .Returns(expectedPatientGroup);
 
-        //    // Assert
-        //    var actualResult = Assert.IsType<ActionResult<IEnumerable<ReadUserDto>>>(result);
-        //    var okResult = Assert.IsType<OkObjectResult>(actualResult.Result);
-        //    Assert.Equal(200, okResult.StatusCode);
-        //}
+            var patientGroupController = new PatientGroupController(patientGroupServiceStub.Object, mockHttpContextAccessor.Object);
 
-        //[Fact]
-        //// UnitOfWork_StateUnderTest_ExpectedBehaviour
-        //public void PostPatientGroup_WithPatientGroupToCreate_ReturnsCreatedString()
-        //{
-        //    // Arrange
-        //    var expectedPatientGroup = CreateRandomPatientGroup();
-        //    var patientGroupController = new PatientGroupController(patientGroupServiceStub.Object, httpContextStub.Object);
+            var patientGroup = new CreatePatientGroupDto()
+            {
+                GroupName = "Ward-A",
+                Description = "Dementia group",
+            };
 
-        //    patientGroupServiceStub.Setup(service => service.Create("Ward-A", "Dementia group", "1358d9d3-b805-4ec3-a0ee-cdd35864e8ba"))
-        //        .Returns(expectedPatientGroup);
+            // Act
+            var result = patientGroupController.PostPatientGroup(patientGroup);
 
-        //    var patientGroup = new CreatePatientGroupDto()
-        //    {
-        //        GroupName = "Ward-A",
-        //        Description = "Dementia group",
-        //    };
+            // Assert
+            // convert result
+            var actualResult = Assert.IsType<ActionResult<ReadPatientGroupDto>>(result);
+            var createdAtActionResult = Assert.IsType<CreatedAtActionResult>(actualResult.Result);
+            var stringResult = Assert.IsType<String>(createdAtActionResult.Value);
+            Assert.Equal($"{patientGroup.GroupName} Added", stringResult);
+        }
 
-        //    // Act
-        //    var result = patientGroupController.PostPatientGroup(patientGroup);
-
-        //    // Assert
-        //    // convert result
-        //    var actualResult = Assert.IsType<ActionResult<ReadPatientGroupDto>>(result);
-        //    var createdAtActionResult = Assert.IsType<CreatedAtActionResult>(actualResult.Result);
-        //    var stringResult = Assert.IsType<String>(createdAtActionResult.Value);
-        //    Assert.Equal($"{patientGroup.GroupName} Added", stringResult);
-        //}
-
-
-
-        //// UnitOfWork_StateUnderTest_ExpectedBehaviour
+        //ToDo
         //[Fact]
         //// UnitOfWork_StateUnderTest_ExpectedBehaviour
         //public void PostUserToPatientGroup_WithUserToCreate_ReturnsLoggerInfo()
         //{
-        //    // Arrange
+        //    // Arrange 
+        //    var user = GenerateAuthenticatedUser();
+
+        //    //Mock IHttpContextAccessor
+        //    var context = new DefaultHttpContext { User = user };
+        //    var fakeTenantId = organisationId;
+        //    mockHttpContextAccessor.Setup(_ => _.HttpContext).Returns(context);
+
+        //    //Mock IPatientGroupService
         //    var expectedOrgnaisation = CreateRandomOrganisation();
         //    var expecteduser = CreateRandomUser();
         //    var expectedPatientGroup = CreateRandomPatientGroup();
-        //    var patientGroupController = new PatientGroupController(patientGroupServiceStub.Object, httpContextStub.Object);
-
         //    patientGroupServiceStub.Setup(service => service.GetPatientGroupByIdandTenant(expectedPatientGroup.Id, expectedOrgnaisation.Id))
         //        .Returns(expectedPatientGroup);
+
+        //    var patientGroupController = new PatientGroupController(patientGroupServiceStub.Object, mockHttpContextAccessor.Object);
 
         //    // Act
         //    var result = patientGroupController.PostUserToPatientGroup(expectedPatientGroup.Id, expecteduser.Id);
@@ -183,45 +190,114 @@ namespace User_Service_Test.ServiceTests.ControllerTest
         //    // ToDO
         //}
 
-        //[Fact]
-        //// UnitOfWork_StateUnderTest_ExpectedBehaviour
-        //public void GetPatientPatientGroups_ReturnsPatientGroup()
-        //{
-        //    // Arrange 
-        //    var expectedPatientGroup = CreateRandomPatientGroup();
-        //    var expectedOrganisation = CreateRandomOrganisation();
-        //    var expectedPatient = CreateRandomPatient();
-        //    var patientGroupController = new PatientGroupController(patientGroupServiceStub.Object, httpContextStub.Object);
+        [Fact]
+        // UnitOfWork_StateUnderTest_ExpectedBehaviour
+        public void GetPatientPatientGroups_ReturnsPatientGroup()
+        {
+            // Arrange 
+            var user = GenerateAuthenticatedUser();
 
-        //    patientGroupServiceStub.Setup(service => service.GetForPatient(expectedPatient.Id, expectedOrganisation.Id))
-        //        .Returns(expectedPatient.PatientGroups);
+            //Mock IHttpContextAccessor
+            var context = new DefaultHttpContext { User = user };
+            var fakeTenantId = organisationId;
+            mockHttpContextAccessor.Setup(_ => _.HttpContext).Returns(context);
 
-        //    // Act           
-        //    var result = patientGroupController.GetPatientPatientGroups(expectedPatient.Id);
+            //Mock IPatientGroupService
+            var expectedPatientGroup = CreateRandomPatientGroup();
+            var expectedOrganisation = CreateRandomOrganisation();
+            var expectedPatient = CreateRandomPatient();
+            patientGroupServiceStub.Setup(service => service.GetForPatient(expectedPatient.Id, expectedOrganisation.Id))
+                .Returns(expectedPatient.PatientGroups);
 
-        //    // Assert
-        //    Assert.NotNull(result);
-        //}
+            var patientGroupController = new PatientGroupController(patientGroupServiceStub.Object, mockHttpContextAccessor.Object);
 
-        //[Fact]
-        //// UnitOfWork_StateUnderTest_ExpectedBehaviour
-        //public void GetCaregiverPatientGroups_ReturnsPatientGroup()
-        //{
-        //    // Arrange 
-        //    var expectedPatientGroup = CreateRandomPatientGroup();
-        //    var expectedOrganisation = CreateRandomOrganisation();
-        //    var expectedCaregiver = CreateRandomCaregiver();
-        //    var patientGroupController = new PatientGroupController(patientGroupServiceStub.Object, httpContextStub.Object);
+            // Act           
+            var result = patientGroupController.GetPatientPatientGroups(expectedPatient.Id);
 
-        //    patientGroupServiceStub.Setup(service => service.GetForPatient(expectedCaregiver.Id, expectedOrganisation.Id))
-        //        .Returns(expectedCaregiver.PatientGroups);
+            // Assert
+            Assert.NotNull(result);
+        }
 
-        //    // Act           
-        //    var result = patientGroupController.GetPatientPatientGroups(expectedCaregiver.Id);
+        [Fact]
+        // UnitOfWork_StateUnderTest_ExpectedBehaviour
+        public void GetCaregiverPatientGroups_ReturnsPatientGroup()
+        {
+            // Arrange 
+            var user = GenerateAuthenticatedUser();
 
-        //    // Assert
-        //    Assert.NotNull(result);
-        //}
+            //Mock IHttpContextAccessor
+            var context = new DefaultHttpContext { User = user };
+            var fakeTenantId = organisationId;
+            mockHttpContextAccessor.Setup(_ => _.HttpContext).Returns(context);
+
+            //Mock IPatientGroupService
+            var expectedPatientGroup = CreateRandomPatientGroup();
+            var expectedOrganisation = CreateRandomOrganisation();
+            var expectedCaregiver = CreateRandomCaregiver();
+            patientGroupServiceStub.Setup(service => service.GetForPatient(expectedCaregiver.Id, expectedOrganisation.Id))
+                .Returns(expectedCaregiver.PatientGroups);
+
+
+            var patientGroupController = new PatientGroupController(patientGroupServiceStub.Object, mockHttpContextAccessor.Object);
+
+            // Act           
+            var result = patientGroupController.GetPatientPatientGroups(expectedCaregiver.Id);
+
+            // Assert
+            Assert.NotNull(result);
+        }
+
+        [Fact]
+        // UnitOfWork_StateUnderTest_ExpectedBehaviour
+        public void UpdatePatientGroup_WithpatientGroupToUpdate_ReturnsUpdatePatientGroup()
+        {
+            // Arrange 
+            var user = GenerateAuthenticatedUser();
+
+            //Mock IHttpContextAccessor
+            var context = new DefaultHttpContext { User = user };
+            var fakeTenantId = organisationId;
+            mockHttpContextAccessor.Setup(_ => _.HttpContext).Returns(context);
+
+            //Mock IUserService
+            var existingPatientGroup = CreateRandomPatientGroup();
+            var expectedOrgnaisation = CreateRandomOrganisation();
+            var existingPatientGroupId = existingPatientGroup.Id;
+
+            var patientGroupToUpdate = new UpdatePatientGroupDto()
+            {
+                GroupName = "Ward-B",
+                Description = "Dementia group",
+            };
+
+            var updatedUser = UpdatePatientGroup(patientGroupToUpdate.GroupName, patientGroupToUpdate.Description);
+
+            patientGroupServiceStub.Setup(service => service.GetPatientGroupByIdandTenant(existingPatientGroupId, expectedOrgnaisation.Id))
+                .Returns(existingPatientGroup);
+            patientGroupServiceStub.Setup(service => service.Update(existingPatientGroupId, patientGroupToUpdate.GroupName, patientGroupToUpdate.Description, expectedOrgnaisation.Id))
+                .Returns(updatedUser);
+
+            var patientGroupController = new PatientGroupController(patientGroupServiceStub.Object, mockHttpContextAccessor.Object);
+
+            // Act 
+            var result = patientGroupController.UpdatePatientGroup(existingPatientGroupId, patientGroupToUpdate);
+
+            // Assert
+            var actualResult = Assert.IsType<ReadPatientGroupDto>(result);
+            Assert.Equal(patientGroupToUpdate.GroupName, actualResult.GroupName);
+            Assert.Equal(patientGroupToUpdate.Description, actualResult.Description);
+        }
+
+        private ClaimsPrincipal GenerateAuthenticatedUser()
+        {
+            var user = new ClaimsPrincipal(new ClaimsIdentity(new Claim[] {
+                                        new Claim(ClaimTypes.NameIdentifier, Guid.NewGuid().ToString()),
+                                        new Claim(ClaimTypes.Name, "gunnar@somecompany.com"),
+                                        new Claim("http://schemas.microsoft.com/identity/claims/tenantid", organisationId)
+                                        // other required and custom claims
+                                   }, "TestAuthentication"));
+            return user;
+        }
 
         private User CreateRandomUser()
         {
@@ -358,6 +434,19 @@ namespace User_Service_Test.ServiceTests.ControllerTest
             patients.Add(patient1);
             patients.Add(patient2);
             return patients;
+        }
+
+        private PatientGroup UpdatePatientGroup(string? groupName, string? description)
+        {
+            var existingPatientGroup = CreateRandomPatientGroup();
+            return new()
+            {
+                Id = existingPatientGroup.Id,
+                GroupName = groupName,
+                Description = description,
+                Users = existingPatientGroup.Users,
+                Organisation = existingPatientGroup.Organisation,
+            };
         }
     }
 }

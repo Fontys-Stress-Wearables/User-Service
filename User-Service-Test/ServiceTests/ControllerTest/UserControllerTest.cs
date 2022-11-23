@@ -6,6 +6,7 @@ using Moq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using User_Service.Controllers;
@@ -23,22 +24,27 @@ namespace User_Service_Test.ServiceTests.ControllerTest
 
         private readonly Mock<IUserService> userServiceStub = new Mock<IUserService>();
 
-        private readonly Mock<IHttpContextAccessor> httpContextStub = new Mock<IHttpContextAccessor>();
+        private readonly Mock<IHttpContextAccessor> mockHttpContextAccessor = new Mock<IHttpContextAccessor>();
 
-        private string toBeOrganisationId = "1358d9d3-b805-4ec3-a0ee-cdd35864e8ba";
+        private string organisationId = "1358d9d3-b805-4ec3-a0ee-cdd35864e8ba";
 
 
         [Fact]
         // UnitOfWork_StateUnderTest_ExpectedBehaviour
         public void GetUserByID_WithInexisitingUser_ReturnsNotFound()
         {
-            // Arrange
-            var context = new DefaultHttpContext();
-            context.Request.Headers["Tenant-ID"] = toBeOrganisationId;
-            userServiceStub.Setup(service => service.GetUser(It.IsAny<Guid>().ToString(), It.IsAny<Guid>().ToString())).Returns((User)null);
-            httpContextStub.Setup(http => http.HttpContext).Returns(context);
+            // Arrange 
+            var user = GenerateAuthenticatedUser();
 
-            var controller = new UserController(userServiceStub.Object, organisationServiceStub.Object, httpContextStub.Object);
+            //Mock IHttpContextAccessor
+            var context = new DefaultHttpContext { User = user };
+            var fakeTenantId = organisationId;
+            mockHttpContextAccessor.Setup(_ => _.HttpContext).Returns(context);
+
+            //Mock IUserService
+            userServiceStub.Setup(service => service.GetUser(It.IsAny<Guid>().ToString(), It.IsAny<Guid>().ToString())).Returns((User)null);
+
+            var controller = new UserController(userServiceStub.Object, organisationServiceStub.Object, mockHttpContextAccessor.Object);
 
             // Act
             var actualResult = controller.GetUsersById(Guid.NewGuid().ToString());
@@ -47,27 +53,25 @@ namespace User_Service_Test.ServiceTests.ControllerTest
             Assert.IsType<NotFoundResult>(actualResult.Result);
         }
 
-        //public Book(IHeaderConfiguration headerConfiguration, IHttpContextAccessor httpContextAccessor)
-        //{
-        //    _httpContextAccessor = httpContextAccessor;
-        //    _tenantID = headerConfiguration.GetTenantId(_httpContextAccessor);
-        //}
-
         [Fact]
         // UnitOfWork_StateUnderTest_ExpectedBehaviour
         public void GetAllUsers_ReturnsAllUsers()
         {
             // Arrange 
-            var context = new DefaultHttpContext();
-            context.Request.Headers["Tenant-ID"] = toBeOrganisationId;
+            var user = GenerateAuthenticatedUser();
 
+            //Mock IHttpContextAccessor
+            var context = new DefaultHttpContext { User = user };
+            var fakeTenantId = organisationId;
+            mockHttpContextAccessor.Setup(_ => _.HttpContext).Returns(context);
+
+            //Mock IUserSerivce
             var expectedUsers = CreateRandomUsers();
             var expectedOrganisation = CreateRandomOrganisation();
-            var controller = new UserController(userServiceStub.Object, organisationServiceStub.Object, httpContextStub.Object);
-
-            httpContextStub.Setup(http => http.HttpContext).Returns(context);
-            userServiceStub.Setup(service => service.GetAll(toBeOrganisationId))
+            userServiceStub.Setup(service => service.GetAll(organisationId))
                 .Returns(expectedUsers);
+
+            var controller = new UserController(userServiceStub.Object, organisationServiceStub.Object, mockHttpContextAccessor.Object);
 
             // Act           
             var result = controller.GetAllUsers();
@@ -80,16 +84,49 @@ namespace User_Service_Test.ServiceTests.ControllerTest
 
         [Fact]
         // UnitOfWork_StateUnderTest_ExpectedBehaviour
+        public void GetUserByID_WithexisitingUser_ReturnsUser()
+        {
+            // Arrange 
+            var user = GenerateAuthenticatedUser();
+
+            //Mock IHttpContextAccessor
+            var context = new DefaultHttpContext { User = user };
+            var fakeTenantId = organisationId;
+            mockHttpContextAccessor.Setup(_ => _.HttpContext).Returns(context);
+
+            //Mock IUserService
+            var existingUser = CreateRandomUser();
+            var expectedOrganisation = CreateRandomOrganisation();
+            userServiceStub.Setup(service => service.GetUser(expectedOrganisation.Id, existingUser.Id))
+                .Returns(existingUser);
+
+            var controller = new UserController(userServiceStub.Object, organisationServiceStub.Object, mockHttpContextAccessor.Object);
+
+            // Act           
+            var result = controller.GetUsersById(existingUser.Id);
+
+            // Assert
+            var actualResult = Assert.IsType<ActionResult<ReadUserDto>>(result);
+            var patientUser = Assert.IsType<ReadUserDto>(actualResult.Value);
+            Assert.Equal("John", patientUser.FirstName);
+            Assert.Equal("Doe", patientUser.LastName);
+        }
+
+        [Fact]
+        // UnitOfWork_StateUnderTest_ExpectedBehaviour
         public void PostUser_WithUserToCreate_ReturnsCreatedString()
         {
-            // Arrange
-            var context = new DefaultHttpContext();
-            context.Request.Headers["Tenant-ID"] = toBeOrganisationId;
+            // Arrange 
+            var user = GenerateAuthenticatedUser();
 
+            //Mock IHttpContextAccessor
+            var context = new DefaultHttpContext { User = user };
+            var fakeTenantId = organisationId;
+            mockHttpContextAccessor.Setup(_ => _.HttpContext).Returns(context);
+
+            //Mock IUserSerivce
             var expectedOrgnaisation = CreateRandomOrganisation();
-            var userController = new UserController(userServiceStub.Object, organisationServiceStub.Object, httpContextStub.Object);
-
-            httpContextStub.Setup(http => http.HttpContext).Returns(context);
+            var userController = new UserController(userServiceStub.Object, organisationServiceStub.Object, mockHttpContextAccessor.Object);
 
             var patient = new CreateUserDto()
             {
@@ -111,45 +148,59 @@ namespace User_Service_Test.ServiceTests.ControllerTest
         }
 
         //ToDo
-        //[Fact]
-        //// UnitOfWork_StateUnderTest_ExpectedBehaviour
-        //public void UpdateUser_WithUserToUpdate_ReturnsUpdateUser()
-        //{
-        //    // Arrange 
-        //    // to update an organisation we need to create an organisation
-        //    var context = new DefaultHttpContext();
-        //    context.Request.Headers["Tenant-ID"] = toBeOrganisationId;
+        [Fact]
+        // UnitOfWork_StateUnderTest_ExpectedBehaviour
+        public void UpdateUser_WithUserToUpdate_ReturnsUpdateUser()
+        {
+            // Arrange 
+            var user = GenerateAuthenticatedUser();
 
-        //    var existingUser = CreateRandomUser();
-        //    var expectedOrgnaisation = CreateRandomOrganisation();
+            //Mock IHttpContextAccessor
+            var context = new DefaultHttpContext { User = user };
+            var fakeTenantId = organisationId;
+            mockHttpContextAccessor.Setup(_ => _.HttpContext).Returns(context);
 
-        //    var userController = new UserController(userServiceStub.Object, organisationServiceStub.Object, httpContextStub.Object);
+            //Mock IUserService
+            var existingUser = CreateRandomUser();
+            var expectedOrgnaisation = CreateRandomOrganisation();
+            var existingUserId = existingUser.Id;
 
-        //    var existingUserId = existingUser.Id;
-        //    var userToUpdate = new UpdateUserDto()
-        //    {
-        //        FirstName = "Johnny",
-        //        LastName = "Doe",
-        //        Birthdate = new DateTime(2010, 1, 5, 4, 0, 15)
-        //    };
+            var userToUpdate = new UpdateUserDto()
+            {
+                FirstName = "Johnny",
+                LastName = "Doe",
+                Birthdate = new DateTime(2010, 1, 5, 4, 0, 15)
+            };
 
-        //    var updatedUser = UpdateUserInfo(userToUpdate.FirstName, userToUpdate.LastName, userToUpdate.Birthdate);
+            var updatedUser = UpdateUserInfo(userToUpdate.FirstName, userToUpdate.LastName, userToUpdate.Birthdate);
 
-        //    httpContextStub.Setup(http => http.HttpContext).Returns(context);
-        //    userServiceStub.Setup(service => service.GetUser(expectedOrgnaisation.Id, existingUserId))
-        //        .Returns(existingUser);
-        //    userServiceStub.Setup(service => service.UpdateUser(expectedOrgnaisation.Id, existingUserId, userToUpdate.FirstName, userToUpdate.LastName, userToUpdate.Birthdate))
-        //        .Returns(updatedUser);
+            userServiceStub.Setup(service => service.GetUser(expectedOrgnaisation.Id, existingUserId))
+                .Returns(existingUser);
+            userServiceStub.Setup(service => service.UpdateUser(expectedOrgnaisation.Id, existingUserId, userToUpdate.FirstName, userToUpdate.LastName, userToUpdate.Birthdate))
+                .Returns(updatedUser);
 
-        //    // Act 
-        //    var result = userController.UpdateUser(existingUserId, userToUpdate);
+            var userController = new UserController(userServiceStub.Object, organisationServiceStub.Object, mockHttpContextAccessor.Object);
 
-        //    // Assert
-        //    var actualResult = Assert.IsType<ReadUserDto>(result);
-        //    Assert.Equal(userToUpdate.LastName, actualResult.LastName);
-        //    Assert.Equal(userToUpdate.FirstName, actualResult.FirstName);
-        //    Assert.Equal(userToUpdate.Birthdate, actualResult.Birthdate);
-        //}
+            // Act 
+            var result = userController.UpdateUser(existingUserId, userToUpdate);
+
+            // Assert
+            var actualResult = Assert.IsType<ReadUserDto>(result);
+            Assert.Equal(userToUpdate.LastName, actualResult.LastName);
+            Assert.Equal(userToUpdate.FirstName, actualResult.FirstName);
+            Assert.Equal(userToUpdate.Birthdate, actualResult.Birthdate);
+        }
+
+        private ClaimsPrincipal GenerateAuthenticatedUser() 
+        {
+            var user = new ClaimsPrincipal(new ClaimsIdentity(new Claim[] {
+                                        new Claim(ClaimTypes.NameIdentifier, Guid.NewGuid().ToString()),
+                                        new Claim(ClaimTypes.Name, "gunnar@somecompany.com"),
+                                        new Claim("http://schemas.microsoft.com/identity/claims/tenantid", organisationId)
+                                        // other required and custom claims
+                                   }, "TestAuthentication"));
+            return user;
+        }
 
         private IEnumerable<User> CreateRandomUsers()
         {
