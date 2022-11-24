@@ -17,18 +17,20 @@ namespace User_Service.Controllers
     {
         private readonly IUserService userService;
         private readonly IOrganisationService organisationService;
+        private readonly IHttpContextAccessor httpContextAccessor;
 
-        public UserController(IUserService userService, IOrganisationService organisationService)
+        public UserController(IUserService userService, IOrganisationService organisationService, IHttpContextAccessor httpContextAccessor)
         {
             this.userService = userService;
             this.organisationService = organisationService;
+            this.httpContextAccessor = httpContextAccessor;
         }
 
         [Authorize(Roles = "Organization.Admin")]
         [HttpGet]
         public ActionResult<IEnumerable<ReadUserDto>> GetAllUsers()
         {
-            var users = userService.GetAll(HttpContext.User.GetTenantId()!)
+            var users = userService.GetAll(httpContextAccessor.HttpContext.User.GetTenantId()!)
                         .Select(item => item.AsUserDto());
             return Ok(users);
         }
@@ -37,7 +39,7 @@ namespace User_Service.Controllers
         [HttpGet("{id}")]
         public ActionResult<ReadUserDto> GetUsersById(string id)
         {
-            var user = userService.GetUser(HttpContext.User.GetTenantId(), id);
+            var user = userService.GetUser(httpContextAccessor.HttpContext.User.GetTenantId(), id);
 
             if (user is null)
             {
@@ -57,7 +59,7 @@ namespace User_Service.Controllers
                 Birthdate = createUserDto.Birthdate,
                 IsActive = true,
                 Id = Guid.NewGuid().ToString(),
-                Organisation = organisationService.GetOrganisationByID(HttpContext.User.GetTenantId()),
+                Organisation = organisationService.GetOrganisationByID(httpContextAccessor.HttpContext.User.GetTenantId()),
                 Role = createUserDto.Role
             };
             userService.AddUser(userModel);
@@ -69,7 +71,7 @@ namespace User_Service.Controllers
         [HttpPut("updates/{id}")]
         public ReadUserDto UpdateUser(string id, UpdateUserDto updateUserDto)
         {
-            var userData = userService.UpdateUser(HttpContext.User.GetTenantId()!, id, updateUserDto.FirstName, updateUserDto.LastName, updateUserDto.Birthdate);
+            var userData = userService.UpdateUser(httpContextAccessor.HttpContext.User.GetTenantId()!, id, updateUserDto.FirstName, updateUserDto.LastName, updateUserDto.Birthdate);
             return userData.AsUserDto();
         }
     }
