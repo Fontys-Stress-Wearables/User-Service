@@ -1,6 +1,7 @@
 using AutoMapper;
 using Castle.Core.Logging;
 using FluentAssertions;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -43,7 +44,7 @@ namespace User_Service_Test.ServiceTests.ControllerTest
 
         [Fact]
         // UnitOfWork_StateUnderTest_ExpectedBehaviour
-        public void GetOrganisationByID_WithExisitingOrganisation_ReturnsNotFound()
+        public void GetOrganisationByID_WithExisitingOrganisation_ReturnsOrganisation()
         {
             // Arrange 
             var expectedOrgnaisation = CreateRandomOrganisation();
@@ -61,6 +62,8 @@ namespace User_Service_Test.ServiceTests.ControllerTest
             var okResult = Assert.IsType<ReadOrganisationDto>(actualResult.Value);
             Assert.Equal("Tue medical", okResult.Name);
         }
+
+        //ToDO test GetOrganisationPatientGroupsByID
 
         [Fact]
         // UnitOfWork_StateUnderTest_ExpectedBehaviour
@@ -119,6 +122,32 @@ namespace User_Service_Test.ServiceTests.ControllerTest
 
             Assert.Equal(updatedOrganisationName, organisation.Name);
         }
+
+        [Fact]
+        // UnitOfWork_StateUnderTest_ExpectedBehaviour
+        public void RemoveOrganisation_WithOrganisationToDelete_ReturnsOk()
+        {
+            // Arrange 
+            // to update an organisation we need to create an organisation
+            string toBeDeleteOrganisationID = "123456789";
+            var existingOrganisation = CreateRandomOrganisation();
+            var existingOrganisationId = existingOrganisation.Id;
+
+            var controller = new OrganisationController(serviceStub.Object, loggerStub.Object);
+            serviceStub.Setup(service => service.GetOrganisationByID(toBeDeleteOrganisationID))
+                .Returns(existingOrganisation);
+
+
+            // Act 
+            var result = controller.RemoveOrganisation(existingOrganisationId);
+
+            // Assert
+            var actualResult = Assert.IsType<ActionResult<HttpResponse>>(result);
+            var httpResponse = Assert.IsType<OkObjectResult>(actualResult.Result);
+            Assert.Equal($"Organisation with Id:'{existingOrganisationId}' has been deleted.", httpResponse.Value); 
+        }
+
+
 
         private Organisation CreateRandomOrganisation()
         {

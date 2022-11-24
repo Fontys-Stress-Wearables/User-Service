@@ -35,6 +35,8 @@ namespace User_Service.Controllers
             return patientGroup.AsPatientGroupDto();
         }
 
+
+
         [HttpGet("{patientGroupID}/patients")]
         public ActionResult<IEnumerable<ReadUserDto>> GetAllPatientsInPatientGroup(string patientGroupID)
         {
