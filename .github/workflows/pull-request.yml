@@ -1,0 +1,56 @@
+name: Pull Request
+on: [ pull_request ]
+
+env:
+  DOTNET_VERSION: '6.0.402'
+
+jobs:
+  build:
+
+    name: build-${{matrix.os}}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+        
+    steps:
+    - uses: actions/checkout@v3
+    - name: Setup .NET Core
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: ${{ env.DOTNET_VERSION }}
+
+    - name: Install dependencies
+      run: dotnet restore
+      working-directory: User-Service
+      
+    - name: Build
+      run: dotnet build --configuration Release --no-restore
+      working-directory: User-Service
+
+    - name: Publish
+      run: dotnet publish User-Service/User-Service.csproj -c Release -o release --nologo
+      
+    - name: Persist workflow data as artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: user-artifact
+        path: /home/runner/work/User-Service/User-Service/release/
+
+  analyse:
+    name: Unit Tests
+    needs: [ build ]
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Download workflow data
+        uses: actions/download-artifact@v3
+        with:
+          name: user-artifact
+          path: /home/runner/work/User-Service/User-Service/release/
+      
+      - name: Test
+        run: dotnet test --no-restore --verbosity normal
+        working-directory: User-ServiceTests
