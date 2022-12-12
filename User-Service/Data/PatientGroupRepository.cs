@@ -10,7 +10,6 @@ namespace User_Service.Data
 
         }
 
-        // return all patient groups in this organisation
         public IEnumerable<PatientGroup> GetAllFromTenant(string tenantId)
         {
             return Context.Set<PatientGroup>().Where(x => x.Organisation.Id == tenantId).ToList();
@@ -22,8 +21,7 @@ namespace User_Service.Data
 
             Context.PatientGroups.Update(patientGroup);
         }
-
-
+        
         public PatientGroup? GetByIdAndTenant(string id, string tenantId)
         {
             return Context.Set<PatientGroup>().Where(x => x.Organisation.Id == tenantId).FirstOrDefault(x => x.Id == id);

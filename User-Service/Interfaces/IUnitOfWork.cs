@@ -6,7 +6,6 @@ namespace User_Service.Interfaces
     {
         IOrganisationRepository Organisations { get; }
         IUserRepository Users { get; }
-
         IPatientGroupRepository PatientGroups { get; }
         int Complete();
     }
