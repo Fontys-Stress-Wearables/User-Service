@@ -16,13 +16,7 @@ namespace User_Service.Services
             this._unitOfWork = _unitOfWork;
             _userService = userService;
         }
-
-        //public PatientGroupService(IUnitOfWork _unitOfWork, INatsService natsService)
-        //{
-        //    this._unitOfWork = _unitOfWork;
-        //    this._natsService = natsService;
-        //}
-
+        
         public PatientGroup GetPatientGroupByIdandTenant(string patientGroupId, string tenantId)
         {
             var patientGroup = _unitOfWork.PatientGroups.GetByIdAndTenant(patientGroupId, tenantId);
@@ -94,7 +88,7 @@ namespace User_Service.Services
             return caregiversInPatientGroup;
         }
 
-        public async Task AddUserToPatientGroup(string patientGroupId, string userId, string tenantId)
+        public void AddUserToPatientGroup(string patientGroupId, string userId, string tenantId)
         {
             var patientGroup = GetPatientGroupByIdandTenant(patientGroupId, tenantId);
 
@@ -177,8 +171,7 @@ namespace User_Service.Services
         public IEnumerable<PatientGroup> GetAll(string tenantId)
         {
             var patientGroups = _unitOfWork.PatientGroups.GetAllFromTenant(tenantId);
-
-
+            
             return patientGroups;
         }
     }

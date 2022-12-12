@@ -9,7 +9,7 @@ namespace User_Service.Interfaces.IServices
         public PatientGroup Update(string patientGroupId, string? name, string? description, string tenantId);
         public PatientGroup Create(string name, string? description, string tenantId);
         public void Delete(string id, string tenantId);
-        public Task AddUserToPatientGroup(string patientGroupId, string userId, string tenantId);
+        public void AddUserToPatientGroup(string patientGroupId, string userId, string tenantId);
         public void RemoveUserFromPatientGroup(string patientGroupId, string userId, string tenantId);
         public List<User> GetAllCaregiversInPatientGroup(string patientGroupId, string tenantId);
         public List<User> GetAllPatientsInPatientGroup(string patientGroupId, string tenantId);
