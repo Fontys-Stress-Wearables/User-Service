@@ -6,12 +6,10 @@ namespace User_Service.Middlewares;
 public class OrganisationAuthorisationMiddleware
 {
     private readonly RequestDelegate _next;
-    private readonly IConfiguration _configuration;
 
     public OrganisationAuthorisationMiddleware(RequestDelegate next, IConfiguration config)
     {
         _next = next;
-        _configuration = config;
     }
 
     public async Task InvokeAsync(HttpContext context)
@@ -22,11 +20,6 @@ public class OrganisationAuthorisationMiddleware
         {
             throw new NotFoundException("tenant not found");
         }
-
-        //if (!organizationService.Exists(tenant))
-        //{
-        //    throw new UnauthorizedException("tenant not found");
-        //}
 
         await _next(context);
     }
