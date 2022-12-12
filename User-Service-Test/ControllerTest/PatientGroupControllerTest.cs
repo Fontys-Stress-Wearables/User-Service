@@ -61,57 +61,6 @@ namespace User_Service_Test.ControllerTest
             Assert.Equal("Ward-A", patientGroup.GroupName);
         }
 
-        private User CreateRandomUser()
-        {
-            return new()
-            {
-                Id = "123456789",
-                FirstName = "John",
-                LastName = "Doe",
-                Birthdate = DateTime.Now,
-                IsActive = true,
-                Organisation = CreateRandomOrganisation(),
-                Role = "Patient",
-                PatientGroups = null
-            };
-        }
-
-        private User CreateRandomPatient()
-        {
-            return new()
-            {
-                Id = "123456789",
-                FirstName = "John",
-                LastName = "Doe",
-                Birthdate = DateTime.Now,
-                IsActive = true,
-                Organisation = CreateRandomOrganisation(),
-                Role = "Patient",
-                PatientGroups = new List<PatientGroup>
-                {
-                    CreateRandomPatientGroup()
-                }
-            };
-        }
-
-        private User CreateRandomCaregiver()
-        {
-            return new()
-            {
-                Id = "123456789",
-                FirstName = "John",
-                LastName = "Doe",
-                Birthdate = DateTime.Now,
-                IsActive = true,
-                Organisation = CreateRandomOrganisation(),
-                Role = "Caregiver",
-                PatientGroups = new List<PatientGroup>
-                {
-                    CreateRandomPatientGroup()
-                }
-            };
-        }
-
         private Organisation CreateRandomOrganisation()
         {
             return new()
@@ -133,69 +82,6 @@ namespace User_Service_Test.ControllerTest
                 Users = new List<User>(),
                 Organisation = CreateRandomOrganisation()
             };
-        }
-
-
-        private List<User> CreateRandomCaregivers()
-        {
-            List<User> caregivers = new List<User>();
-
-            var caregiver1 = new User()
-            {
-                Id = "1234567",
-                FirstName = "John",
-                LastName = "Doe",
-                Birthdate = DateTime.Now,
-                IsActive = true,
-                Organisation = CreateRandomOrganisation(),
-                Role = "Caregiver"
-            };
-
-            var caregiver2 = new User()
-            {
-                Id = "2345678",
-                FirstName = "Carian",
-                LastName = "Giverian",
-                Birthdate = DateTime.Now,
-                IsActive = true,
-                Organisation = CreateRandomOrganisation(),
-                Role = "Caregiver"
-            };
-
-            caregivers.Add(caregiver1);
-            caregivers.Add(caregiver2);
-            return caregivers;
-        }
-
-        private List<User> CreateRandomPatients()
-        {
-            List<User> patients = new List<User>();
-
-            var patient1 = new User()
-            {
-                Id = "1234567",
-                FirstName = "John",
-                LastName = "Doe",
-                Birthdate = DateTime.Now,
-                IsActive = true,
-                Organisation = CreateRandomOrganisation(),
-                Role = "Patient"
-            };
-
-            var patient2 = new User()
-            {
-                Id = "2345678",
-                FirstName = "Carian",
-                LastName = "Giverian",
-                Birthdate = DateTime.Now,
-                IsActive = true,
-                Organisation = CreateRandomOrganisation(),
-                Role = "Patient"
-            };
-
-            patients.Add(patient1);
-            patients.Add(patient2);
-            return patients;
         }
     }
 }
