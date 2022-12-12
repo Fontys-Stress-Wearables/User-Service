@@ -46,9 +46,7 @@ namespace User_Service_Test.ControllerTest
             var okResult = Assert.IsType<ReadOrganisationDto>(actualResult.Value);
             Assert.Equal("Tue medical", okResult.Name);
         }
-
-        //ToDO test GetOrganisationPatientGroupsByID
-
+        
         [Fact]
         public void PostOrganisation_WithOrganisationToCreate_ReturnsCreatedItem()
         {
