@@ -7,9 +7,6 @@ using User_Service.Models;
 
 namespace User_Service.Controllers
 {
-    /// <summary>
-    /// Organisation Controller
-    /// </summary>
     [Authorize]
     [Route("organisations")]
     [ApiController]
