@@ -75,7 +75,7 @@ namespace User_Service.Services
             user.LastName = lastName ?? user.LastName;
             user.Birthdate = birthdate ?? user.Birthdate;
 
-            _unitOfWork.Users.UpdateUserInDB(user);
+            _unitOfWork.Users.UpdateUser(user);
             //_natsService.Publish("patient-updated", user.TenantId, user);
             //_natsService.Publish("th-logs", "", $"User updated with ID: '{user.Id}.'");
 
