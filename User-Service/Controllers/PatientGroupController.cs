@@ -102,9 +102,9 @@ namespace User_Service.Controllers
 
         [Authorize(Roles = "Organization.Admin")]
         [HttpPost("{patientGroupID}/user")]
-        public async Task PostUserToPatientGroup(string patientGroupID, [FromBody] string userId )
+        public void PostUserToPatientGroup(string patientGroupID, [FromBody] string userId )
         {
-            await _patientGroupService.AddUserToPatientGroup(patientGroupID, userId, _httpContextAccessor.HttpContext.User.GetTenantId()!);
+            _patientGroupService.AddUserToPatientGroup(patientGroupID, userId, _httpContextAccessor.HttpContext.User.GetTenantId()!);
         }
 
 
