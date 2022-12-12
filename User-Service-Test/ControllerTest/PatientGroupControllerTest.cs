@@ -8,7 +8,7 @@ using User_Service.Interfaces.IServices;
 using User_Service.Models;
 using Xunit;
 
-namespace User_Service_Test.ServiceTests.ControllerTest
+namespace User_Service_Test.ControllerTest
 {
     public  class PatientGroupControllerTest
     {
