@@ -38,7 +38,6 @@ namespace User_Service.Services
         {
             EventHandler<MsgHandlerEventArgs> h = (sender, args) =>
             {
-                // print the message
                 string receivedMessage = Encoding.UTF8.GetString(args.Message.Data);
                 Console.WriteLine(receivedMessage);
             };
