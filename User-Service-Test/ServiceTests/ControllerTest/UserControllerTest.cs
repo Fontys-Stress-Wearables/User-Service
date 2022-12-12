@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 using Microsoft.Identity.Web;
 using Moq;
 using System;
@@ -18,27 +17,23 @@ namespace User_Service_Test.ServiceTests.ControllerTest
 {
     public class UserControllerTest
     {
-        private readonly Mock<IOrganisationService> organisationServiceStub = new Mock<IOrganisationService>();
-        private readonly Mock<ILogger<OrganisationController>> loggerStub = new Mock<ILogger<OrganisationController>>();
+        private readonly Mock<IOrganisationService> _organisationServiceStub = new();
+        private readonly Mock<IUserService> _userServiceStub = new();
 
-        private readonly Mock<IUserService> userServiceStub = new Mock<IUserService>();
-
-        private readonly Mock<IHttpContextAccessor> httpContextStub = new Mock<IHttpContextAccessor>();
-
-        private string toBeOrganisationId = "1358d9d3-b805-4ec3-a0ee-cdd35864e8ba";
+        private readonly Mock<IHttpContextAccessor> _httpContextStub = new();
+        private readonly string _organisationId = "1358d9d3-b805-4ec3-a0ee-cdd35864e8ba";
 
 
         [Fact]
-        // UnitOfWork_StateUnderTest_ExpectedBehaviour
-        public void GetUserByID_WithInexisitingUser_ReturnsNotFound()
+        public void GetUserByID_WithNonexistentUser_ReturnsNotFound()
         {
             // Arrange
             var context = new DefaultHttpContext();
-            context.Request.Headers["Tenant-ID"] = toBeOrganisationId;
-            userServiceStub.Setup(service => service.GetUser(It.IsAny<Guid>().ToString(), It.IsAny<Guid>().ToString())).Returns((User)null);
-            httpContextStub.Setup(http => http.HttpContext).Returns(context);
+            context.Request.Headers["Tenant-ID"] = _organisationId;
+            _userServiceStub.Setup(service => service.GetUser(It.IsAny<Guid>().ToString(), It.IsAny<Guid>().ToString())).Returns((User)null);
+            _httpContextStub.Setup(http => http.HttpContext).Returns(context);
 
-            var controller = new UserController(userServiceStub.Object, organisationServiceStub.Object, httpContextStub.Object);
+            var controller = new UserController(_userServiceStub.Object, _organisationServiceStub.Object, _httpContextStub.Object);
 
             // Act
             var actualResult = controller.GetUsersById(Guid.NewGuid().ToString());
@@ -47,26 +42,18 @@ namespace User_Service_Test.ServiceTests.ControllerTest
             Assert.IsType<NotFoundResult>(actualResult.Result);
         }
 
-        //public Book(IHeaderConfiguration headerConfiguration, IHttpContextAccessor httpContextAccessor)
-        //{
-        //    _httpContextAccessor = httpContextAccessor;
-        //    _tenantID = headerConfiguration.GetTenantId(_httpContextAccessor);
-        //}
-
         [Fact]
-        // UnitOfWork_StateUnderTest_ExpectedBehaviour
         public void GetAllUsers_ReturnsAllUsers()
         {
             // Arrange 
             var context = new DefaultHttpContext();
-            context.Request.Headers["Tenant-ID"] = toBeOrganisationId;
+            context.Request.Headers["Tenant-ID"] = _organisationId;
 
             var expectedUsers = CreateRandomUsers();
-            var expectedOrganisation = CreateRandomOrganisation();
-            var controller = new UserController(userServiceStub.Object, organisationServiceStub.Object, httpContextStub.Object);
+            var controller = new UserController(_userServiceStub.Object, _organisationServiceStub.Object, _httpContextStub.Object);
 
-            httpContextStub.Setup(http => http.HttpContext).Returns(context);
-            userServiceStub.Setup(service => service.GetAll(toBeOrganisationId))
+            _httpContextStub.Setup(http => http.HttpContext).Returns(context);
+            _userServiceStub.Setup(service => service.GetAll(_organisationId))
                 .Returns(expectedUsers);
 
             // Act           
@@ -79,17 +66,15 @@ namespace User_Service_Test.ServiceTests.ControllerTest
         }
 
         [Fact]
-        // UnitOfWork_StateUnderTest_ExpectedBehaviour
         public void PostUser_WithUserToCreate_ReturnsCreatedString()
         {
             // Arrange
             var context = new DefaultHttpContext();
-            context.Request.Headers["Tenant-ID"] = toBeOrganisationId;
+            context.Request.Headers["Tenant-ID"] = _organisationId;
 
-            var expectedOrgnaisation = CreateRandomOrganisation();
-            var userController = new UserController(userServiceStub.Object, organisationServiceStub.Object, httpContextStub.Object);
+            var userController = new UserController(_userServiceStub.Object, _organisationServiceStub.Object, _httpContextStub.Object);
 
-            httpContextStub.Setup(http => http.HttpContext).Returns(context);
+            _httpContextStub.Setup(http => http.HttpContext).Returns(context);
 
             var patient = new CreateUserDto()
             {
