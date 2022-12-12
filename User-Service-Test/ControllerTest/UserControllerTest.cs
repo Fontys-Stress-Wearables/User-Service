@@ -120,37 +120,6 @@ namespace User_Service_Test.ControllerTest
             return users;
         }
 
-        private User UpdateUserInfo(string? firstName, string? lastName, DateTime birthdate)
-        {
-            var existingUser = CreateRandomUser();
-            return new()
-            {
-                Id = existingUser.Id,
-                FirstName = firstName,
-                LastName = lastName,
-                Birthdate = birthdate,
-                IsActive = existingUser.IsActive,
-                Organisation = existingUser.Organisation,
-                Role = existingUser.Role,
-                PatientGroups = existingUser.PatientGroups
-            };
-        }
-
-        private User CreateRandomUser()
-        {
-            return new()
-            {
-                Id = "123456789",
-                FirstName = "John",
-                LastName = "Doe",
-                Birthdate = DateTime.Now,
-                IsActive = true,
-                Organisation = CreateRandomOrganisation(),
-                Role = "Patient",
-                PatientGroups = null
-            };
-        }
-
         private Organisation CreateRandomOrganisation()
         {
             return new()
