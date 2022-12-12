@@ -8,7 +8,6 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Identity.Web;
 using User_Service.Controllers;
-using User_Service.Dtos.PatientDto;
 using User_Service.Dtos.PatientGroupDto;
 using User_Service.Interfaces;
 using User_Service.Interfaces.IServices;
