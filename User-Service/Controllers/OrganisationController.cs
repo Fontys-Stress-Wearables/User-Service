@@ -1,18 +1,14 @@
-﻿using AutoMapper;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Collections.Generic;
 using User_Service.Dtos.OrganisationDto;
 using User_Service.Dtos.PatientGroupDto;
-using User_Service.Exceptions;
 using User_Service.Interfaces.IServices;
 using User_Service.Models;
-using User_Service.Services;
 
 namespace User_Service.Controllers
 {
     /// <summary>
-    /// Property Controller
+    /// Organisation Controller
     /// </summary>
     [Authorize]
     [Route("organisations")]
@@ -20,12 +16,12 @@ namespace User_Service.Controllers
     public class OrganisationController : ControllerBase
     {
         private readonly IOrganisationService _organisationService;
-        private readonly ILogger<OrganisationController> logger;
+        private readonly ILogger<OrganisationController> _logger;
 
         public OrganisationController(IOrganisationService organisationService, ILogger<OrganisationController> logger)
         {
             _organisationService = organisationService;
-            this.logger = logger;
+            _logger = logger;
         }
 
         [HttpGet("/organisations")]
@@ -38,14 +34,14 @@ namespace User_Service.Controllers
                 return Ok(organisations.AsOrganisationsDto());
             }
 
-            return NotFound("No organistions found");
+            return NotFound("No organisations found");
 
         }
 
         [HttpGet("{id}")]
         public ActionResult<ReadOrganisationDto> GetOrganisationByID(string id)
         {
-            logger.LogInformation($"Getting an Organisation by the {id}");
+            _logger.LogInformation($"Getting an Organisation by the {id}");
 
             var organisation = _organisationService.GetOrganisationByID(id);
 
@@ -60,7 +56,7 @@ namespace User_Service.Controllers
         [HttpGet("patientgroups/{id}")]
         public ActionResult<IEnumerable<ReadPatientGroupDto>> GetOrganisationPatientGroupsByID(string id)
         {
-            logger.LogInformation($"Getting an Organisation by the {id}");
+            _logger.LogInformation($"Getting an Organisation by the {id}");
             var organisation = _organisationService.GetOrganisationByID(id);
 
             if (organisation is null)
@@ -110,7 +106,7 @@ namespace User_Service.Controllers
                 }
             }
 
-            logger.LogInformation($"Organisation {organisationModel.Name} being created ...");
+            _logger.LogInformation($"Organisation {organisationModel.Name} being created ...");
 
             _organisationService.CreateOrganisation(organisationModel);
             // this is the return result which produces the id in the response 
