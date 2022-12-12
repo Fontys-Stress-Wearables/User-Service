@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Identity.Web;
-using User_Service.Dtos.PatientDto;
+using User_Service.Dtos.UserDto;
 using User_Service.Interfaces.IServices;
 using User_Service.Models;
 

@@ -10,7 +10,7 @@ using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using User_Service.Controllers;
-using User_Service.Dtos.PatientDto;
+using User_Service.Dtos.UserDto;
 using User_Service.Interfaces.IServices;
 using User_Service.Models;
 using Xunit;
