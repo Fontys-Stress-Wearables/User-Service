@@ -22,7 +22,7 @@ namespace User_Service.Data
             return Context.Set<User>().Where(x => x.Organisation.Id == tenantId).FirstOrDefault(x => x.Id == patientId);
         }
 
-        public User UpdateUserInDB(User patient)
+        public User UpdateUser(User patient)
         {
             return Context.Set<User>().Update(patient).Entity;
         }

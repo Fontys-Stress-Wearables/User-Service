@@ -6,7 +6,6 @@ namespace User_Service.Interfaces.IServices
     {
         public PatientGroup GetPatientGroupByIdandTenant(string patientGroupId, string tenantId);
         public PatientGroup Update(string patientGroupId, string? name, string? description, string tenantId);
-
         public PatientGroup Create(string name, string? description, string tenantId);
 
         //public void AddPatient(string patientGroupId, string patientId, string tenantId);
