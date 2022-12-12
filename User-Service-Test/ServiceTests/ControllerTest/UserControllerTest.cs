@@ -1,12 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Identity.Web;
 using Moq;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using User_Service.Controllers;
 using User_Service.Dtos.UserDto;
 using User_Service.Interfaces.IServices;
@@ -94,47 +88,6 @@ namespace User_Service_Test.ServiceTests.ControllerTest
             var issue = Assert.IsType<String>(createdAtActionResult.Value);
             Assert.Equal($"{patient.Role} {patient.FirstName} {patient.LastName} Added", issue);
         }
-
-        //ToDo
-        //[Fact]
-        //// UnitOfWork_StateUnderTest_ExpectedBehaviour
-        //public void UpdateUser_WithUserToUpdate_ReturnsUpdateUser()
-        //{
-        //    // Arrange 
-        //    // to update an organisation we need to create an organisation
-        //    var context = new DefaultHttpContext();
-        //    context.Request.Headers["Tenant-ID"] = toBeOrganisationId;
-
-        //    var existingUser = CreateRandomUser();
-        //    var expectedOrgnaisation = CreateRandomOrganisation();
-
-        //    var userController = new UserController(userServiceStub.Object, organisationServiceStub.Object, httpContextStub.Object);
-
-        //    var existingUserId = existingUser.Id;
-        //    var userToUpdate = new UpdateUserDto()
-        //    {
-        //        FirstName = "Johnny",
-        //        LastName = "Doe",
-        //        Birthdate = new DateTime(2010, 1, 5, 4, 0, 15)
-        //    };
-
-        //    var updatedUser = UpdateUserInfo(userToUpdate.FirstName, userToUpdate.LastName, userToUpdate.Birthdate);
-
-        //    httpContextStub.Setup(http => http.HttpContext).Returns(context);
-        //    userServiceStub.Setup(service => service.GetUser(expectedOrgnaisation.Id, existingUserId))
-        //        .Returns(existingUser);
-        //    userServiceStub.Setup(service => service.UpdateUser(expectedOrgnaisation.Id, existingUserId, userToUpdate.FirstName, userToUpdate.LastName, userToUpdate.Birthdate))
-        //        .Returns(updatedUser);
-
-        //    // Act 
-        //    var result = userController.UpdateUser(existingUserId, userToUpdate);
-
-        //    // Assert
-        //    var actualResult = Assert.IsType<ReadUserDto>(result);
-        //    Assert.Equal(userToUpdate.LastName, actualResult.LastName);
-        //    Assert.Equal(userToUpdate.FirstName, actualResult.FirstName);
-        //    Assert.Equal(userToUpdate.Birthdate, actualResult.Birthdate);
-        //}
 
         private IEnumerable<User> CreateRandomUsers()
         {
