@@ -1,6 +1,4 @@
-﻿using System.Runtime.CompilerServices;
-using User_Service.Exceptions;
-using User_Service.Interfaces;
+﻿using User_Service.Interfaces;
 using User_Service.Interfaces.IServices;
 using User_Service.Models;
 
@@ -11,18 +9,10 @@ public class OrganisationService : IOrganisationService
     private readonly IUnitOfWork _unitOfWork;
     //private readonly INatsService _natsService;
 
-    // testing sake
     public OrganisationService(IUnitOfWork unitOfWork)
     {
         _unitOfWork = unitOfWork;
     }
-
-    //public OrganisationService(IUnitOfWork unitOfWork, INatsService natsService)
-    //{
-    //    _unitOfWork = unitOfWork;
-    //    _natsService = natsService;
-    //}
-
 
     public IEnumerable<Organisation> GetAll()
     {

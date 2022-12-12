@@ -17,12 +17,6 @@ namespace User_Service.Services
             _userService = userService;
         }
 
-        //public PatientGroupService(IUnitOfWork _unitOfWork, INatsService natsService)
-        //{
-        //    this._unitOfWork = _unitOfWork;
-        //    this._natsService = natsService;
-        //}
-
         public PatientGroup GetPatientGroupByIdandTenant(string patientGroupId, string tenantId)
         {
             var patientGroup = _unitOfWork.PatientGroups.GetByIdAndTenant(patientGroupId, tenantId);
@@ -177,8 +171,7 @@ namespace User_Service.Services
         public IEnumerable<PatientGroup> GetAll(string tenantId)
         {
             var patientGroups = _unitOfWork.PatientGroups.GetAllFromTenant(tenantId);
-
-
+            
             return patientGroups;
         }
     }

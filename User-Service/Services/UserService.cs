@@ -7,21 +7,14 @@ namespace User_Service.Services
 {
     public class UserService : IUserService
     {
-        // the unit of work service and interface implement the IuserRepo
+        // UnitOfWork implements IUserRepository
         private readonly IUnitOfWork _unitOfWork;
         //private readonly INatsService _natsService;
 
-        // testing sake
         public UserService(IUnitOfWork _unitOfWork)
         {
             this._unitOfWork = _unitOfWork;
         }
-
-        //public UserService(IUnitOfWork _unitOfWork, INatsService _natsService)
-        //{
-        //    this._unitOfWork = _unitOfWork;
-        //    this._natsService = _natsService;
-        //}
 
         public void AddUser(User user)
         {
