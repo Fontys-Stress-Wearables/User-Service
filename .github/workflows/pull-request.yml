@@ -53,7 +53,7 @@ jobs:
       
       - name: Test
         run: dotnet test --no-restore --verbosity normal
-        working-directory: User-ServiceTests
+        working-directory: User-Service-Tests
 
   sonarcloud:
     name: SonarCloud
