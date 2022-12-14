@@ -15,7 +15,7 @@ namespace User_Service.Controllers
     /// Property Controller
     /// </summary>
     [Authorize]
-    [Route("organisations")]
+    [Route("organizations")]
     [ApiController]
     public class OrganisationController : ControllerBase
     {
@@ -28,7 +28,7 @@ namespace User_Service.Controllers
             this.logger = logger;
         }
 
-        [HttpGet("/organisations")]
+        [HttpGet]
         public ActionResult<IEnumerable<Organisation>> GetOrganizations()
         {
             var organisations = _organisationService.GetAll();
@@ -121,7 +121,7 @@ namespace User_Service.Controllers
             return CreatedAtAction(nameof(GetOrganisationByID), new { id = organisationModel.Id }, organisationModel);
         }
 
-        [HttpPut("update/{id}")]
+        [HttpPut("{id}")]
         public ActionResult<ReadOrganisationDto> UpdateOrganisation(string id, UpdateOrganisationDto updateOrganisationDto)
         {
             if (string.IsNullOrWhiteSpace(updateOrganisationDto.Name))
@@ -139,7 +139,7 @@ namespace User_Service.Controllers
             return organisationData.AsOrganisationDto();
         }
 
-        [HttpDelete("delete/{id}")]
+        [HttpDelete("{id}")]
         public ActionResult<HttpResponse> RemoveOrganisation(string id)
         {
             var organisation = _organisationService.GetOrganisationByID(id);

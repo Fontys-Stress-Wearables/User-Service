@@ -14,7 +14,7 @@ namespace User_Service.Controllers
 {
     [Authorize]
     [ApiController]
-    [Route("patientgroups")]
+    [Route("patient-groups")]
     public class PatientGroupController : ControllerBase
     {
         private string _tenantId;
@@ -28,7 +28,7 @@ namespace User_Service.Controllers
         }
 
         [Authorize(Roles = "Organization.Admin")]
-        [HttpGet("/patientGroups")]
+        [HttpGet]
         public ActionResult<IEnumerable<PatientGroup>> GetAllPatientGroups()
         {
             var patientGroups = _patientGroupService.GetAll(httpContextAccessor.HttpContext.User.GetTenantId());
@@ -162,10 +162,10 @@ namespace User_Service.Controllers
         }
 
         [Authorize(Roles = "Organization.Admin")]
-        [HttpDelete("{id}/user")]
-        public void RemovePatientFromPatientGroup(string id, [FromBody] string userId)
+        [HttpDelete("{groupId}/user")]
+        public void RemovePatientFromPatientGroup(string groupId, [FromBody] string userId)
         {
-            _patientGroupService.RemoveUserFromPatientGroup(id, userId, httpContextAccessor.HttpContext.User.GetTenantId()!);
+            _patientGroupService.RemoveUserFromPatientGroup(groupId, userId, httpContextAccessor.HttpContext.User.GetTenantId()!);
             //_patientGroupService.RemoveUserFromPatientGroup(id, userId, "1358d9d3-b805-4ec3-a0ee-cdd35864e8ba");
         }
 

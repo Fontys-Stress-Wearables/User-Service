@@ -9,6 +9,8 @@ namespace User_Service.Interfaces.IRepositories
 
         public User GetByIdAndTenant(string tenantId, string patientId);
 
-        public User UpdateUserInDB(User patient);
+        public User UpdateUserInDB(User user);
+
+        public void UpdateCaregiverByTenant(ICollection<User> azureCaregivers, string tenantId);
     }
 }
