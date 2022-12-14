@@ -7,7 +7,7 @@ namespace User_Service.Data
     {
         public OrganisationRepository(DatabaseContext context) : base(context)
         {
-
+            
         }
     }
 }

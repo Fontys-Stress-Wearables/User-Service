@@ -1,31 +1,24 @@
-﻿using AutoMapper;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Collections.Generic;
 using User_Service.Dtos.OrganisationDto;
 using User_Service.Dtos.PatientGroupDto;
-using User_Service.Exceptions;
 using User_Service.Interfaces.IServices;
 using User_Service.Models;
-using User_Service.Services;
 
 namespace User_Service.Controllers
 {
-    /// <summary>
-    /// Property Controller
-    /// </summary>
     [Authorize]
     [Route("organisations")]
     [ApiController]
     public class OrganisationController : ControllerBase
     {
         private readonly IOrganisationService _organisationService;
-        private readonly ILogger<OrganisationController> logger;
+        private readonly ILogger<OrganisationController> _logger;
 
         public OrganisationController(IOrganisationService organisationService, ILogger<OrganisationController> logger)
         {
             _organisationService = organisationService;
-            this.logger = logger;
+            _logger = logger;
         }
 
         [HttpGet("/organisations")]
@@ -33,7 +26,7 @@ namespace User_Service.Controllers
         {
             var organisations = _organisationService.GetAll();
 
-            if (organisations != null)
+            if (organisations is not null)
             {
                 return Ok(organisations.AsOrganisationsDto());
             }
@@ -45,7 +38,7 @@ namespace User_Service.Controllers
         [HttpGet("{id}")]
         public ActionResult<ReadOrganisationDto> GetOrganisationByID(string id)
         {
-            logger.LogInformation($"Getting an Organisation by the {id}");
+            _logger.LogInformation($"Getting an Organisation by the {id}");
 
             var organisation = _organisationService.GetOrganisationByID(id);
 
@@ -60,7 +53,7 @@ namespace User_Service.Controllers
         [HttpGet("patientgroups/{id}")]
         public ActionResult<IEnumerable<ReadPatientGroupDto>> GetOrganisationPatientGroupsByID(string id)
         {
-            logger.LogInformation($"Getting an Organisation by the {id}");
+            _logger.LogInformation($"Getting an Organisation by the {id}");
             var organisation = _organisationService.GetOrganisationByID(id);
 
             if (organisation is null)
@@ -89,8 +82,7 @@ namespace User_Service.Controllers
             {
                 return BadRequest($"Organisation Id cannot be empty.");
             }
-            // creating a new item entity
-            // by storing the createdItemDTO as the properties created in the Item class
+
             var organisationModel = new Organisation
             {
                 Id = createOrganisationDTO.Id,
@@ -99,18 +91,12 @@ namespace User_Service.Controllers
 
             var organisations = _organisationService.GetAll();
 
-            if (organisations.Any())
+            if (organisations.Any(o => o.Id == organisationModel.Id))
             {
-                foreach (var organisation in organisations)
-                {
-                    if (organisationModel.Id == organisation.Id)
-                    {
-                        return BadRequest($"Organisation with Id:'{organisationModel.Id}' already exists.");
-                    }
-                }
+                return BadRequest($"Organisation with Id:'{organisationModel.Id}' already exists.");
             }
 
-            logger.LogInformation($"Organisation {organisationModel.Name} being created ...");
+            _logger.LogInformation($"Organisation {organisationModel.Name} being created ...");
 
             _organisationService.CreateOrganisation(organisationModel);
             // this is the return result which produces the id in the response 

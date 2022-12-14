@@ -7,6 +7,7 @@ namespace User_Service.Data
     {
         public DatabaseContext(DbContextOptions<DatabaseContext> options) : base(options)
         {
+            
         }
 
         public DbSet<Organisation> Organization { get; set; }
@@ -21,6 +22,5 @@ namespace User_Service.Data
             modelBuilder.Entity<User>().ToTable("User");
             modelBuilder.Entity<PatientGroup>().ToTable("PatientGroup");
         }
-
     }
 }

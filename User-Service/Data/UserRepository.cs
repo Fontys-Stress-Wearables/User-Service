@@ -10,21 +10,19 @@ namespace User_Service.Data
 
         }
        
-        // get all the patients under this tenant id 
         public IEnumerable<User> GetAllByTenant(string tenantId)
         {
-            return _context.Set<User>().Where(x => x.Organisation.Id == tenantId).ToList();
+            return Context.Set<User>().Where(x => x.Organisation.Id == tenantId).ToList();
         }
 
-
-        public User GetByIdAndTenant(string tenantId, string patientId)
+        public User? GetByIdAndTenant(string tenantId, string patientId)
         {
-            return _context.Set<User>().Where(x => x.Organisation.Id == tenantId).FirstOrDefault(x => x.Id == patientId);
+            return Context.Set<User>().Where(x => x.Organisation.Id == tenantId).FirstOrDefault(x => x.Id == patientId);
         }
 
-        public User UpdateUserInDB(User patient)
+        public User UpdateUser(User patient)
         {
-            return _context.Set<User>().Update(patient).Entity;
+            return Context.Set<User>().Update(patient).Entity;
         }
     }
 }

@@ -1,5 +1,3 @@
-using AutoMapper;
-using Castle.Core.Logging;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -10,61 +8,47 @@ using User_Service.Interfaces.IServices;
 using User_Service.Models;
 using Xunit;
 
-namespace User_Service_Test.ServiceTests.ControllerTest
+namespace User_Service_Test.ControllerTest
 {
     public class OrganisationControllerTest
     {
-        private readonly Mock<IOrganisationService> serviceStub = new Mock<IOrganisationService>();
+        private readonly Mock<IOrganisationService> _serviceStub = new();
 
-        private readonly Mock<ILogger<OrganisationController>> loggerStub = new Mock<ILogger<OrganisationController>>();
+        private readonly Mock<ILogger<OrganisationController>> _loggerStub = new();
+        
+        
         [Fact]
-        // UnitOfWork_StateUnderTest_ExpectedBehaviour
         public void GetOrganisationByID_WithUnExisitingOrganisation_ReturnsNotFound()
         {
             // Arrange
-            // setup of GetOrganisationById method to return null
-            // we want to test the controller takes care of null values
-
-            // whenever the controller invokes GetOrganisationById method create any Guid for its arguement and return a null value
-            serviceStub.Setup(service => service.GetOrganisationByID(It.IsAny<Guid>().ToString())).Returns((Organisation)null);
-
-            var controller = new OrganisationController(serviceStub.Object, loggerStub.Object);
-
-
+            _serviceStub.Setup(service => service.GetOrganisationByID(It.IsAny<Guid>().ToString())).Returns((Organisation)null);
+            var controller = new OrganisationController(_serviceStub.Object, _loggerStub.Object);
+            
             // Act
             var actualResult = controller.GetOrganisationByID(Guid.NewGuid().ToString());
 
             // Assert
-            // actualReult.Result 
-            // actual Result.Expected Result
             Assert.IsType<NotFoundObjectResult>(actualResult.Result);
         }
 
         [Fact]
-        // UnitOfWork_StateUnderTest_ExpectedBehaviour
-        public void GetOrganisationByID_WithExisitingOrganisation_ReturnsOrganisation()
+        public void GetOrganisationByID_WithoutExistingOrganisation_ReturnsOrganisation()
         {
             // Arrange 
-            var expectedOrgnaisation = CreateRandomOrganisation();
-            // This is where we set the method we want to test and what it should return 
-            // forcing the GetOrganisationById method to return the newly created Organisation
-            var controller = new OrganisationController(serviceStub.Object, loggerStub.Object);
-            serviceStub.Setup(service => service.GetOrganisationByID("123456789")).Returns(expectedOrgnaisation);
+            var expectedOrganisation = CreateRandomOrganisation();
+            var controller = new OrganisationController(_serviceStub.Object, _loggerStub.Object);
+            _serviceStub.Setup(service => service.GetOrganisationByID("123456789")).Returns(expectedOrganisation);
 
             // Act           
             var result = controller.GetOrganisationByID("123456789");
 
             // Assert
-            // this checks if the values of the actual Result(object) is equal to the expectedOrgnisation values
             var actualResult = Assert.IsType<ActionResult<ReadOrganisationDto>>(result);
             var okResult = Assert.IsType<ReadOrganisationDto>(actualResult.Value);
             Assert.Equal("Tue medical", okResult.Name);
         }
-
-        //ToDO test GetOrganisationPatientGroupsByID
-
+        
         [Fact]
-        // UnitOfWork_StateUnderTest_ExpectedBehaviour
         public void PostOrganisation_WithOrganisationToCreate_ReturnsCreatedItem()
         {
             // Arrange 
@@ -74,13 +58,12 @@ namespace User_Service_Test.ServiceTests.ControllerTest
                 Name = "Fontys medical"
             };
 
-            var controller = new OrganisationController(serviceStub.Object, loggerStub.Object);
+            var controller = new OrganisationController(_serviceStub.Object, _loggerStub.Object);
 
             // Act 
             var result = controller.PostOrganisation(organisationToCreate);
 
             // Assert
-            // convert result
             var actualResult = Assert.IsType<ActionResult<ReadOrganisationDto>>(result);
             var okResult = Assert.IsType<CreatedAtActionResult>(actualResult.Result);
             var organisation = Assert.IsType<Organisation>(okResult.Value);
@@ -89,11 +72,9 @@ namespace User_Service_Test.ServiceTests.ControllerTest
         }
 
         [Fact]
-        // UnitOfWork_StateUnderTest_ExpectedBehaviour
         public void UpdateOrganisation_WithOrganisationToUpdate_ReturnsUpdateItem()
         {
             // Arrange 
-            // to update an organisation we need to create an organisation
             string updatedOrganisationName = "Fontys medical ward";
             var existingOrganisation = CreateRandomOrganisation();
             var existingOrganisationId = existingOrganisation.Id;
@@ -103,12 +84,12 @@ namespace User_Service_Test.ServiceTests.ControllerTest
                 Name = updatedOrganisationName
             };
 
-            var controller = new OrganisationController(serviceStub.Object, loggerStub.Object);
-            serviceStub.Setup(service => service.GetOrganisationByID("123456789"))
+            var controller = new OrganisationController(_serviceStub.Object, _loggerStub.Object);
+            _serviceStub.Setup(service => service.GetOrganisationByID("123456789"))
                 .Returns(existingOrganisation);
 
 
-            serviceStub.Setup(service => service.UpdateOrganisationName(existingOrganisationId, updatedOrganisationName))
+            _serviceStub.Setup(service => service.UpdateOrganisationName(existingOrganisationId, updatedOrganisationName))
                 .Returns(UpdateOrganisation(updatedOrganisationName));
 
             // Act 
@@ -117,25 +98,21 @@ namespace User_Service_Test.ServiceTests.ControllerTest
             // Assert
             var actualResult = Assert.IsType<ActionResult<ReadOrganisationDto>>(result);
             var organisation = Assert.IsType<ReadOrganisationDto>(actualResult.Value);
-
             Assert.Equal(updatedOrganisationName, organisation.Name);
         }
 
         [Fact]
-        // UnitOfWork_StateUnderTest_ExpectedBehaviour
         public void RemoveOrganisation_WithOrganisationToDelete_ReturnsOk()
         {
             // Arrange 
-            // to update an organisation we need to create an organisation
-            string toBeDeleteOrganisationID = "123456789";
+            string organisationId = "123456789";
             var existingOrganisation = CreateRandomOrganisation();
             var existingOrganisationId = existingOrganisation.Id;
 
-            var controller = new OrganisationController(serviceStub.Object, loggerStub.Object);
-            serviceStub.Setup(service => service.GetOrganisationByID(toBeDeleteOrganisationID))
+            var controller = new OrganisationController(_serviceStub.Object, _loggerStub.Object);
+            _serviceStub.Setup(service => service.GetOrganisationByID(organisationId))
                 .Returns(existingOrganisation);
-
-
+            
             // Act 
             var result = controller.RemoveOrganisation(existingOrganisationId);
 
@@ -144,9 +121,7 @@ namespace User_Service_Test.ServiceTests.ControllerTest
             var httpResponse = Assert.IsType<OkObjectResult>(actualResult.Result);
             Assert.Equal($"Organisation with Id:'{existingOrganisationId}' has been deleted.", httpResponse.Value);
         }
-
-
-
+        
         private Organisation CreateRandomOrganisation()
         {
             return new()

@@ -2,9 +2,9 @@
 {
     public class NatsMessage<T>
     {
-        public string origin { get; set; } = "user-service";
-        public string target { get; set; }
-        public string tenantId { get; set; }
-        public T message { get; set; }
+        public string Origin { get; set; } = "user-service";
+        public string Target { get; set; }
+        public string TenantId { get; set; }
+        public T Message { get; set; }
     }
 }
