@@ -13,13 +13,15 @@ namespace User_Service.Services
         // the unit of work service and interface implement the IuserRepo
         private readonly IUnitOfWork _unitOfWork;
         private readonly IConfiguration _configuration;
+        private readonly IOrganisationService _organisationService;
         //private readonly INatsService _natsService;
 
         // testing sake
-        public UserService(IUnitOfWork _unitOfWork, IConfiguration configuration)
+        public UserService(IUnitOfWork _unitOfWork, IConfiguration configuration, IOrganisationService _organisationService)
         {
             this._unitOfWork = _unitOfWork;
             _configuration = configuration;
+            this._organisationService = _organisationService;
 
         }
         //public UserService(IUnitOfWork _unitOfWork, INatsService _natsService)
@@ -95,7 +97,7 @@ namespace User_Service.Services
         public async Task<ICollection<User>> FetchCaregiversFromAzureGraph(string tenantId)
         {
             var credential = new ChainedTokenCredential(
-                new ClientSecretCredential(tenantId, _configuration["AzureAD:ClientID"],
+                new ClientSecretCredential(tenantId, _configuration["AzureAD:ClientId"],
                 _configuration["AzureAD:ClientSecret"]));
 
             var token = await credential.GetTokenAsync(
@@ -113,7 +115,8 @@ namespace User_Service.Services
                 }));
 
             var users = await graphServiceClient.Users.Request().GetAsync();
-            var caregivers = users.Select(x => new User {Id = x.Id, Role = "Caregiver"}).ToList();
+            var caregivers = users.Select(x => new User {Id = x.Id, Role = "Caregiver", FirstName = x.DisplayName, LastName = x.GivenName, IsActive = true, 
+                Birthdate = DateTime.Now, Organisation = _organisationService.GetOrganisationByID(tenantId)}).ToList();
 
             _unitOfWork.Users.UpdateCaregiverByTenant(caregivers, tenantId);
             _unitOfWork.Complete();

@@ -12,6 +12,8 @@ namespace User_Service.Interfaces.IServices
 
         public Task<User> GetCaregiver(string tenantId, string id);
 
+        public Task<ICollection<User>> FetchCaregiversFromAzureGraph(string tenantId);
+
         public User UpdateUser(string tenantId, string patientId, string? firstName, string? lastName,
             DateTime? birthdate);
     }

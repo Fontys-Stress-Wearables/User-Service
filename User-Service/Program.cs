@@ -14,7 +14,10 @@ var builder = WebApplication.CreateBuilder(args);
 
 //---------Comment out if you want to run without authentication-------------
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddMicrosoftIdentityWebApi(builder.Configuration.GetSection("AzureAd"));
+    .AddMicrosoftIdentityWebApi(builder.Configuration.GetSection("AzureAd"))
+        .EnableTokenAcquisitionToCallDownstreamApi()
+            .AddMicrosoftGraph(builder.Configuration.GetSection("GraphBeta"))
+            .AddInMemoryTokenCaches();
 //---------------------------------------------------------------------------
 
 // authorization for organization admin
@@ -42,6 +45,9 @@ builder.Services.AddCors();
 builder.Services.AddControllers().AddNewtonsoftJson(options =>
             options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
         );
+
+builder.Services.AddHostedService<UserSyncService>();
+
 builder.Services.AddEndpointsApiExplorer();
 
 builder.Services.AddSwaggerGen();
