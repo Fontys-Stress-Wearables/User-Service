@@ -1,4 +1,4 @@
-﻿using System.Runtime.CompilerServices;
+using System.Runtime.CompilerServices;
 using User_Service.Interfaces.IRepositories;
 using User_Service.Models;
 using Microsoft.EntityFrameworkCore;

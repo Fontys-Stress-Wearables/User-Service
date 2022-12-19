@@ -1,4 +1,4 @@
-﻿namespace User_Service.Dtos.PatientDto
+﻿namespace User_Service.Dtos.UserDto
 {
     public class UpdateUserDto
     {

@@ -30,7 +30,7 @@ namespace User_Service.Services
 
         public void Publish<T>(string target, string tenantId, T data)
         {
-            var message = new NatsMessage<T> { target = target, tenantId = tenantId, message = data };
+            var message = new NatsMessage<T> { Target = target, TenantId = tenantId, Message = data };
             _connection?.Publish(target, Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(message)));
         }
 

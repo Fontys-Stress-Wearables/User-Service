@@ -5,6 +5,9 @@ namespace User_Service.Data
 {
     public class UnitOfWork : IUnitOfWork
     {
+        public IOrganisationRepository Organisations { get; }
+        public IUserRepository Users { get; }
+        public IPatientGroupRepository PatientGroups { get; }
         private readonly DatabaseContext _context;
 
         public UnitOfWork(DatabaseContext context)
@@ -14,12 +17,6 @@ namespace User_Service.Data
             Users = new UserRepository(_context);
             PatientGroups = new PatientGroupRepository(_context);
         }
-
-        public IOrganisationRepository Organisations { get; }
-
-        public IUserRepository Users { get; }
-
-        public IPatientGroupRepository PatientGroups { get; }
 
         public void Dispose()
         {

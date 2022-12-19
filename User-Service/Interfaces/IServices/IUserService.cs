@@ -1,4 +1,4 @@
-﻿using User_Service.Models;
+using User_Service.Models;
 
 namespace User_Service.Interfaces.IServices
 {

@@ -1,14 +1,10 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 using Microsoft.Identity.Web;
-using User_Service.Dtos.OrganisationDto;
-using User_Service.Dtos.PatientDto;
 using User_Service.Dtos.PatientGroupDto;
-using User_Service.Interfaces;
+using User_Service.Dtos.UserDto;
 using User_Service.Interfaces.IServices;
 using User_Service.Models;
-using User_Service.Services;
 
 namespace User_Service.Controllers
 {
@@ -17,14 +13,13 @@ namespace User_Service.Controllers
     [Route("patient-groups")]
     public class PatientGroupController : ControllerBase
     {
-        private string _tenantId;
-        private IPatientGroupService _patientGroupService;
-        private readonly IHttpContextAccessor httpContextAccessor;
+        private readonly IPatientGroupService _patientGroupService;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
         public PatientGroupController(IPatientGroupService patientGroupService, IHttpContextAccessor httpContextAccessor)
         {
-            this._patientGroupService = patientGroupService;
-            this.httpContextAccessor = httpContextAccessor;
+            _patientGroupService = patientGroupService;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         [Authorize(Roles = "Organization.Admin")]
@@ -45,7 +40,7 @@ namespace User_Service.Controllers
         [HttpGet("{patientGroupID}")]
         public ActionResult<ReadPatientGroupDto> GetPatientGroupById(string patientGroupID)
         {
-            var patientGroup = _patientGroupService.GetPatientGroupByIdandTenant(patientGroupID, httpContextAccessor.HttpContext.User.GetTenantId());
+            var patientGroup = _patientGroupService.GetPatientGroupByIdandTenant(patientGroupID, _httpContextAccessor.HttpContext.User.GetTenantId());
 
             if (patientGroup is null)
             {
@@ -89,15 +84,8 @@ namespace User_Service.Controllers
         [HttpPost]
         public ActionResult<ReadPatientGroupDto> PostPatientGroup(CreatePatientGroupDto createPatientGroupDto)
         {
-            var patientGroup = _patientGroupService.Create(createPatientGroupDto.GroupName, createPatientGroupDto.Description, httpContextAccessor.HttpContext.User.GetTenantId()!);
-
-            //var patientGroup = _patientGroupService.Create(createPatientGroupDto.GroupName, createPatientGroupDto.Description, "1358d9d3-b805-4ec3-a0ee-cdd35864e8ba");
-
-            // this is the return result which produces the id in the response 
-            // i.e https;//localhost:7113/items/985398y3843y43
-
-            // if the item is created its Id will be gotten back
-            // https;//localhost:7113/items/{id of created item}
+            var patientGroup = _patientGroupService.Create(createPatientGroupDto.GroupName, createPatientGroupDto.Description, _httpContextAccessor.HttpContext.User.GetTenantId()!);
+            
             return CreatedAtAction(nameof(GetPatientGroupById), new { patientGroupID = patientGroup.Id }, $"{patientGroup.GroupName} Added");
         }
 
@@ -106,11 +94,10 @@ namespace User_Service.Controllers
         public async Task PostUserToPatientGroup(string patientGroupID, [FromBody] string userId )
         {
             await _patientGroupService.AddUserToPatientGroup(patientGroupID, userId, httpContextAccessor.HttpContext.User.GetTenantId()!);
-
         }
 
 
-        // all patient groups a patient is in
+        // PatientGroups a Patient is in
         [Authorize(Roles = "Organization.Admin")]
         [HttpGet("patients/{userId}")]
         public IEnumerable<ReadPatientGroupDto> GetPatientPatientGroups(string userId)
@@ -121,7 +108,7 @@ namespace User_Service.Controllers
             return groups; 
         }
 
-        // all patient groups a patient is in
+        // PatientGroups a Caregiver is in
         [Authorize(Roles = "Organization.Admin, Organization.Caregiver")]
         [HttpGet("caregivers/{userId}")]
         public IEnumerable<ReadPatientGroupDto> GetCaregiverPatientGroups(string userId)
@@ -154,6 +141,5 @@ namespace User_Service.Controllers
         {
             _patientGroupService.RemoveUserFromPatientGroup(groupId, userId, httpContextAccessor.HttpContext.User.GetTenantId()!);
         }
-
     }
 }
