@@ -166,7 +166,6 @@ namespace User_Service.Controllers
         public void RemovePatientFromPatientGroup(string groupId, [FromBody] string userId)
         {
             _patientGroupService.RemoveUserFromPatientGroup(groupId, userId, httpContextAccessor.HttpContext.User.GetTenantId()!);
-            //_patientGroupService.RemoveUserFromPatientGroup(id, userId, "1358d9d3-b805-4ec3-a0ee-cdd35864e8ba");
         }
 
     }

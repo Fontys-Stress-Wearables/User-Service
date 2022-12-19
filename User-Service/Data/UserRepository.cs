@@ -12,7 +12,6 @@ namespace User_Service.Data
 
         }
 
-        // get all the patients under this tenant id 
         public IEnumerable<User> GetAllByTenant(string tenantId)
         {
             return _context.Set<User>().Where(x => x.Organisation.Id == tenantId).ToList();
@@ -60,7 +59,7 @@ namespace User_Service.Data
             }
         }
 
-        public User UpdateUserInDB(User patient)
+        public User UpdateUser(User patient)
         {
             return _context.Set<User>().Update(patient).Entity;
         }

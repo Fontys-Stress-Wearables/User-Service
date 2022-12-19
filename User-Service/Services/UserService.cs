@@ -16,7 +16,6 @@ namespace User_Service.Services
         private readonly IOrganisationService _organisationService;
         //private readonly INatsService _natsService;
 
-        // testing sake
         public UserService(IUnitOfWork _unitOfWork, IConfiguration configuration, IOrganisationService _organisationService)
         {
             this._unitOfWork = _unitOfWork;
@@ -24,11 +23,6 @@ namespace User_Service.Services
             this._organisationService = _organisationService;
 
         }
-        //public UserService(IUnitOfWork _unitOfWork, INatsService _natsService)
-        //{
-        //    this._unitOfWork = _unitOfWork;
-        //    this._natsService = _natsService;
-        //}
 
         public void AddUser(User user)
         {
@@ -137,7 +131,7 @@ namespace User_Service.Services
             user.LastName = lastName ?? user.LastName;
             user.Birthdate = birthdate ?? user.Birthdate;
 
-            _unitOfWork.Users.UpdateUserInDB(user);
+            _unitOfWork.Users.UpdateUser(user);
             //_natsService.Publish("patient-updated", user.TenantId, user);
             //_natsService.Publish("th-logs", "", $"User updated with ID: '{user.Id}.'");
 
