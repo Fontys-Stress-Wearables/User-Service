@@ -12,15 +12,12 @@ using User_Service.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-//---------Comment out if you want to run without authentication-------------
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddMicrosoftIdentityWebApi(builder.Configuration.GetSection("AzureAd"))
         .EnableTokenAcquisitionToCallDownstreamApi()
             .AddMicrosoftGraph(builder.Configuration.GetSection("GraphBeta"))
             .AddInMemoryTokenCaches();
-//---------------------------------------------------------------------------
 
-// authorization for organization admin
 builder.Services.AddAuthorization(policies =>
 {
     policies.AddPolicy("caregiver", p =>
@@ -51,7 +48,6 @@ builder.Services.AddHostedService<UserSyncService>();
 builder.Services.AddEndpointsApiExplorer();
 
 builder.Services.AddSwaggerGen();
-//---------Comment out if you want to run without authentication-------------
 builder.Services.AddSwaggerGen(setup =>
 {
     var jwtSecurityScheme = new OpenApiSecurityScheme
@@ -76,7 +72,6 @@ builder.Services.AddSwaggerGen(setup =>
         { jwtSecurityScheme, Array.Empty<string>() }
     });
 });
-//-------------------------------------------------------------------------------
 
 builder.Services.AddDbContext<DatabaseContext>(options =>
     options
@@ -103,16 +98,12 @@ using (var scope = app.Services.CreateScope())
 }
 
 app.UseHttpsRedirection();
-//----Comment out if you want to run without authentication----
 app.UseAuthentication();
-//-------------------------------------------------------------
 app.UseAuthorization();
 
 app.UseCors(c => c.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin());
 
-//----Comment out if you want to run without authentication----
 app.UseOrganizationAuthorization();
-//-------------------------------------------------------------
 
 app.MapControllers();
 

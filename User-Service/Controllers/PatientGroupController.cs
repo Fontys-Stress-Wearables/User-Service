@@ -32,8 +32,6 @@ namespace User_Service.Controllers
         public ActionResult<IEnumerable<PatientGroup>> GetAllPatientGroups()
         {
             var patientGroups = _patientGroupService.GetAll(httpContextAccessor.HttpContext.User.GetTenantId());
-            //var patientGroups = _patientGroupService.GetAll(httpContextAccessor.HttpContext.User.GetTenantId());
-            //var patientGroup = _patientGroupService.GetPatientGroupByIdandTenant(patientGroupID, "1358d9d3-b805-4ec3-a0ee-cdd35864e8ba");
 
             if (patientGroups is null)
             {
@@ -62,7 +60,6 @@ namespace User_Service.Controllers
         public ActionResult<IEnumerable<ReadUserDto>> GetAllPatientsInPatientGroup(string patientGroupID)
         {
             var usersInPatientGroup = _patientGroupService.GetAllPatientsInPatientGroup(patientGroupID, httpContextAccessor.HttpContext.User.GetTenantId());
-            //var usersInPatientGroup = _patientGroupService.GetAllPatientsInPatientGroup(patientGroupID, "1358d9d3-b805-4ec3-a0ee-cdd35864e8ba");
 
             if (usersInPatientGroup is null)
             {
@@ -78,7 +75,6 @@ namespace User_Service.Controllers
         public ActionResult<IEnumerable<ReadUserDto>> GetAllCaregiversInPatientGroup(string patientGroupID)
         {
             var usersInPatientGroup = _patientGroupService.GetAllCaregiversInPatientGroup(patientGroupID, httpContextAccessor.HttpContext.User.GetTenantId());
-            //var usersInPatientGroup = _patientGroupService.GetAllCaregiversInPatientGroup(patientGroupID, "1358d9d3-b805-4ec3-a0ee-cdd35864e8ba");
 
             if (usersInPatientGroup is null)
             {
@@ -111,7 +107,6 @@ namespace User_Service.Controllers
         {
             await _patientGroupService.AddUserToPatientGroup(patientGroupID, userId, httpContextAccessor.HttpContext.User.GetTenantId()!);
 
-            //await _patientGroupService.AddUserToPatientGroup(patientGroupID, userId, "1358d9d3-b805-4ec3-a0ee-cdd35864e8ba");
         }
 
 
@@ -123,8 +118,6 @@ namespace User_Service.Controllers
             var groups = _patientGroupService.GetForPatient(userId, httpContextAccessor.HttpContext.User.GetTenantId()!)
                 .Select(patientGroup => patientGroup.AsPatientGroupDto()); 
 
-            //var groups = _patientGroupService.GetForPatient(userId, "1358d9d3-b805-4ec3-a0ee-cdd35864e8ba")
-            //    .Select(patientGroup => patientGroup.AsPatientGroupDto());
             return groups; 
         }
 
@@ -136,8 +129,6 @@ namespace User_Service.Controllers
             var groups = _patientGroupService.GetForCareGivers(userId, httpContextAccessor.HttpContext.User.GetTenantId()!)
                 .Select(patientGroup => patientGroup.AsPatientGroupDto());
 
-            //var groups = _patientGroupService.GetForCareGivers(userId, "1358d9d3-b805-4ec3-a0ee-cdd35864e8ba")
-            //    .Select(patientGroup => patientGroup.AsPatientGroupDto());
             return groups;
         }
 
@@ -146,8 +137,6 @@ namespace User_Service.Controllers
         public void DeletePatientGroup(string id)
         {
             _patientGroupService.Delete(id, httpContextAccessor.HttpContext.User.GetTenantId()!);
-
-            //_patientGroupService.Delete(id, "1358d9d3-b805-4ec3-a0ee-cdd35864e8ba");
         }
 
         [Authorize(Roles = "Organization.Admin")]
@@ -155,8 +144,6 @@ namespace User_Service.Controllers
         public ReadPatientGroupDto UpdatePatientGroup(string id, [FromBody] UpdatePatientGroupDto patientGroup)
         {
             var updatedGroup = _patientGroupService.Update(id, patientGroup.GroupName, patientGroup.Description, httpContextAccessor.HttpContext.User.GetTenantId()!);
-
-            //var updatedGroup = _patientGroupService.Update(id, patientGroup.GroupName, patientGroup.Description, "1358d9d3-b805-4ec3-a0ee-cdd35864e8ba");
 
             return updatedGroup.AsPatientGroupDto();
         }
