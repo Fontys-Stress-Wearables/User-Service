@@ -65,7 +65,7 @@ namespace User_Service.Controllers
         }
 
         [Authorize(Roles = "Organization.Admin, Organization.Caregiver")]
-        [HttpPut("updates/{id}")]
+        [HttpPut("{id}")]
         public ReadUserDto UpdateUser(string id, UpdateUserDto updateUserDto)
         {
             var userData = _userService.UpdateUser(_httpContextAccessor.HttpContext.User.GetTenantId()!, id, updateUserDto.FirstName, updateUserDto.LastName, updateUserDto.Birthdate);

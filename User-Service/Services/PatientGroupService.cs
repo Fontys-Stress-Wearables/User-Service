@@ -1,7 +1,9 @@
-﻿using User_Service.Exceptions;
+﻿using Microsoft.Graph;
+using User_Service.Exceptions;
 using User_Service.Interfaces;
 using User_Service.Interfaces.IServices;
 using User_Service.Models;
+using User = User_Service.Models.User;
 
 namespace User_Service.Services
 {
@@ -92,12 +94,26 @@ namespace User_Service.Services
         {
             var patientGroup = GetPatientGroupByIdandTenant(patientGroupId, tenantId);
 
-            var user = _userService.GetUser(tenantId, userId);
 
-            _unitOfWork.PatientGroups.AddUser(patientGroup, user);
+            var patient = _userService.GetUser(tenantId, userId);
+            if (patient != null)
+            {
+                _unitOfWork.PatientGroups.AddUser(patientGroup, patient);
 
-            //_natsService.Publish("user-added-to-patientgroup", user.Id, patientGroup);
-            _unitOfWork.Complete();
+                //_natsService.Publish("user-added-to-patientgroup", user.Id, patientGroup);
+                _unitOfWork.Complete();
+            }
+            else
+            {
+                var caregiver = await _userService.GetCaregiver(tenantId, userId);
+                if(caregiver != null)
+                {
+                    _unitOfWork.PatientGroups.AddUser(patientGroup, caregiver);
+
+                    //_natsService.Publish("user-added-to-patientgroup", user.Id, patientGroup);
+                    _unitOfWork.Complete();
+                }
+            }
         }
 
         public IEnumerable<PatientGroup> GetForPatient(string userId, string tenantId)
@@ -113,12 +129,12 @@ namespace User_Service.Services
 
         public IEnumerable<PatientGroup> GetForCareGivers(string userId, string tenantId)
         {
-            var carerGiver = _userService.GetUser(tenantId, userId);
-            if (carerGiver.Role != "Caregiver")
+            var carerGiver = _userService.GetCaregiver(tenantId, userId);
+            if (carerGiver == null)
             {
                 throw new NotFoundException($"The Id inputted does not belong to a caregiver");
             }
-            var patientGroups = carerGiver.PatientGroups;
+            var patientGroups = carerGiver.Result.PatientGroups;
             return patientGroups;
         }
 
