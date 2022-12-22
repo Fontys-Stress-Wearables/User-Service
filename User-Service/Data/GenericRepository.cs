@@ -4,31 +4,36 @@ namespace User_Service.Data
 {
     public class GenericRepository<T> : IGenericRepository<T> where T : class
     {
-        protected readonly DatabaseContext Context;
+        protected readonly DatabaseContext _context;
 
         public GenericRepository(DatabaseContext context)
         {
-            Context = context;
+            _context = context;
         }
+
         public T Add(T entity)
         {
-            return Context.Set<T>().Add(entity).Entity;
+            return _context.Set<T>().Add(entity).Entity;
         }
+
         public IEnumerable<T> GetAll()
         {
-            return Context.Set<T>().ToList();
+            return _context.Set<T>().ToList();
         }
+
         public T? GetById(string id)
         {
-            return Context.Set<T>().Find(id);
+            return _context.Set<T>().Find(id);
         }
+
         public T Update(T entity)
         {
-            return Context.Set<T>().Update(entity).Entity;
+            return _context.Set<T>().Update(entity).Entity;
         }
+
         public void Remove(T entity)
         {
-            Context.Set<T>().Remove(entity);
+            _context.Set<T>().Remove(entity);
         }
     }
 }

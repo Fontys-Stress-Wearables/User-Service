@@ -14,12 +14,12 @@ namespace User_Service.Controllers
     public class PatientGroupController : ControllerBase
     {
         private readonly IPatientGroupService _patientGroupService;
-        private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly IHttpContextAccessor httpContextAccessor;
 
         public PatientGroupController(IPatientGroupService patientGroupService, IHttpContextAccessor httpContextAccessor)
         {
             _patientGroupService = patientGroupService;
-            _httpContextAccessor = httpContextAccessor;
+            this.httpContextAccessor = httpContextAccessor;
         }
 
         [Authorize(Roles = "Organization.Admin")]
@@ -40,7 +40,7 @@ namespace User_Service.Controllers
         [HttpGet("{patientGroupID}")]
         public ActionResult<ReadPatientGroupDto> GetPatientGroupById(string patientGroupID)
         {
-            var patientGroup = _patientGroupService.GetPatientGroupByIdandTenant(patientGroupID, _httpContextAccessor.HttpContext.User.GetTenantId());
+            var patientGroup = _patientGroupService.GetPatientGroupByIdandTenant(patientGroupID, httpContextAccessor.HttpContext.User.GetTenantId());
 
             if (patientGroup is null)
             {
@@ -84,7 +84,7 @@ namespace User_Service.Controllers
         [HttpPost]
         public ActionResult<ReadPatientGroupDto> PostPatientGroup(CreatePatientGroupDto createPatientGroupDto)
         {
-            var patientGroup = _patientGroupService.Create(createPatientGroupDto.GroupName, createPatientGroupDto.Description, _httpContextAccessor.HttpContext.User.GetTenantId()!);
+            var patientGroup = _patientGroupService.Create(createPatientGroupDto.GroupName, createPatientGroupDto.Description, httpContextAccessor.HttpContext.User.GetTenantId()!);
             
             return CreatedAtAction(nameof(GetPatientGroupById), new { patientGroupID = patientGroup.Id }, $"{patientGroup.GroupName} Added");
         }
