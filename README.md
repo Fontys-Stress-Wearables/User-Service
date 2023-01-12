@@ -1,5 +1,5 @@
 
-# Stress-Data-Service
+# User-Service
 The user service is responsible for handling the organization information and users within the organization information. 
 
 An Organization should be added to the database connected to the userservice 
