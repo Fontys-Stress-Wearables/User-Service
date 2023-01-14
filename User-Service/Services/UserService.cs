@@ -51,6 +51,11 @@ namespace User_Service.Services
         {
             return _unitOfWork.Users.GetAllByTenant(tenantId);
         }
+        
+        public IEnumerable<User> GetAllPatients(string tenantId)
+        {
+            return _unitOfWork.Users.GetAllPatientsByTenant(tenantId);
+        }
 
         public User GetUser(string tenantId, string id)
         {

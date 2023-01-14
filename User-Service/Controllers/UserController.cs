@@ -32,6 +32,15 @@ namespace User_Service.Controllers
             return Ok(users);
         }
 
+        [Authorize(Roles = "Organization.Admin")] 
+        [HttpGet("patients")]
+        public ActionResult<IEnumerable<ReadUserDto>> GetAllPatients()
+        {
+            var users = _userService.GetAllPatients(_httpContextAccessor.HttpContext.User.GetTenantId()!)
+                .Select(item => item.AsUserDto());
+            return Ok(users);
+        }
+
         [Authorize(Roles = "Organization.Admin, Organization.Caregiver")]
         [HttpGet("{id}")]
         public ActionResult<ReadUserDto> GetUsersById(string id)
@@ -49,7 +58,7 @@ namespace User_Service.Controllers
         [HttpPost]
         public ActionResult<ReadUserDto> PostUser(CreateUserDto createUserDto)
         {
-            var userModel = new User
+            var user = new User
             {
                 FirstName = createUserDto.FirstName,
                 LastName = createUserDto.LastName,
@@ -59,9 +68,9 @@ namespace User_Service.Controllers
                 Organisation = _organisationService.GetOrganisationByID(_httpContextAccessor.HttpContext.User.GetTenantId()),
                 Role = createUserDto.Role
             };
-            _userService.AddUser(userModel);
+            _userService.AddUser(user);
 
-            return CreatedAtAction(nameof(GetUsersById), new { id = userModel.Id }, $"{userModel.Role} {userModel.FirstName} {userModel.LastName} Added");
+            return CreatedAtAction(nameof(GetUsersById), new { id = user.Id }, user);
         }
 
         [Authorize(Roles = "Organization.Admin, Organization.Caregiver")]

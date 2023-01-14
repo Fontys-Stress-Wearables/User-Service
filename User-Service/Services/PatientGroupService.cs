@@ -1,5 +1,4 @@
-﻿using Microsoft.Graph;
-using User_Service.Exceptions;
+﻿using User_Service.Exceptions;
 using User_Service.Interfaces;
 using User_Service.Interfaces.IServices;
 using User_Service.Models;
