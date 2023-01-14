@@ -40,7 +40,7 @@ namespace User_Service.Controllers
         [HttpGet("{patientGroupId}")]
         public ActionResult<ReadPatientGroupDto> GetPatientGroupById(string patientGroupId)
         {
-            var patientGroup = _patientGroupService.GetPatientGroupByIdandTenant(patientGroupId, httpContextAccessor.HttpContext.User.GetTenantId());
+            var patientGroup = _patientGroupService.GetPatientGroupByIdAndTenant(patientGroupId, httpContextAccessor.HttpContext.User.GetTenantId());
 
             if (patientGroup is null)
             {

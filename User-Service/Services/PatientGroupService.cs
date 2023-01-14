@@ -18,7 +18,7 @@ namespace User_Service.Services
             _userService = userService;
         }
 
-        public PatientGroup GetPatientGroupByIdandTenant(string patientGroupId, string tenantId)
+        public PatientGroup GetPatientGroupByIdAndTenant(string patientGroupId, string tenantId)
         {
             var patientGroup = _unitOfWork.PatientGroups.GetByIdAndTenant(patientGroupId, tenantId);
 
@@ -64,12 +64,12 @@ namespace User_Service.Services
         public List<User> GetAllPatientsInPatientGroup(string patientGroupId, string tenantId)
         {
             List<User> patientsInPatientGroup = new List<User>();
-            var patientGroup = GetPatientGroupByIdandTenant(patientGroupId, tenantId);
-            foreach (var item in patientGroup.Users)
+            var patientGroup = GetPatientGroupByIdAndTenant(patientGroupId, tenantId);
+            foreach (var user in patientGroup.Users)
             {
-                if(item.Role == "Patient")
+                if(user.Role == "Patient")
                 {
-                    patientsInPatientGroup.Add(item);
+                    patientsInPatientGroup.Add(user);
                 }
             }
             return patientsInPatientGroup;
@@ -78,12 +78,13 @@ namespace User_Service.Services
         public List<User> GetAllCaregiversInPatientGroup(string patientGroupId, string tenantId)
         {
             List<User> caregiversInPatientGroup = new List<User>();
-            var patientGroup = GetPatientGroupByIdandTenant(patientGroupId, tenantId);
-            foreach (var item in patientGroup.Users)
+            var patientGroup = GetPatientGroupByIdAndTenant(patientGroupId, tenantId);
+            
+            foreach (var user in patientGroup.Users)
             {
-                if (item.Role == "Caregiver")
+                if (user.Role == "Caregiver")
                 {
-                    caregiversInPatientGroup.Add(item);
+                    caregiversInPatientGroup.Add(user);
                 }
             }
             return caregiversInPatientGroup;
@@ -91,7 +92,7 @@ namespace User_Service.Services
 
         public async Task AddUserToPatientGroup(string patientGroupId, string userId, string tenantId)
         {
-            var patientGroup = GetPatientGroupByIdandTenant(patientGroupId, tenantId);
+            var patientGroup = GetPatientGroupByIdAndTenant(patientGroupId, tenantId);
 
 
             var patient = _userService.GetUser(tenantId, userId);
@@ -176,7 +177,7 @@ namespace User_Service.Services
 
         public void RemoveUserFromPatientGroup(string patientGroupId, string userId, string tenantId)
         {
-            var patientGroup = GetPatientGroupByIdandTenant(patientGroupId, tenantId);
+            var patientGroup = GetPatientGroupByIdAndTenant(patientGroupId, tenantId);
 
             var user = _userService.GetUser(tenantId, userId);
             

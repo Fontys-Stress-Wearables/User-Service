@@ -60,7 +60,7 @@ namespace User_Service_Test.ControllerTest
             //Mock IPatientGroupService
             var expectedPatientGroup = CreateRandomPatientGroup();
             _patientGroupServiceStub.Setup(
-                service => service.GetPatientGroupByIdandTenant(expectedPatientGroup.Id, fakeTenantId))
+                service => service.GetPatientGroupByIdAndTenant(expectedPatientGroup.Id, fakeTenantId))
                 .Returns(expectedPatientGroup);
 
             var patientGroupController = new PatientGroupController(_patientGroupServiceStub.Object, _mockHttpContextAccessor.Object);
@@ -210,7 +210,7 @@ namespace User_Service_Test.ControllerTest
 
             var updatedUser = UpdatePatientGroup(patientGroupToUpdate.GroupName, patientGroupToUpdate.Description);
 
-            _patientGroupServiceStub.Setup(service => service.GetPatientGroupByIdandTenant(existingPatientGroupId, expectedOrgnaisation.Id))
+            _patientGroupServiceStub.Setup(service => service.GetPatientGroupByIdAndTenant(existingPatientGroupId, expectedOrgnaisation.Id))
                 .Returns(existingPatientGroup);
             _patientGroupServiceStub.Setup(service => service.Update(existingPatientGroupId, patientGroupToUpdate.GroupName, patientGroupToUpdate.Description, expectedOrgnaisation.Id))
                 .Returns(updatedUser);
