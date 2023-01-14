@@ -61,9 +61,8 @@ namespace User_Service.Services
         {
             var user = _unitOfWork.Users.GetByIdAndTenant(tenantId, id);
 
-            if (user == null || user.Role != "Patient")
+            if (user == null)
             {
-                return null;
                 throw new NotFoundException($"User with id '{id}' doesn't exist.");
             }
 

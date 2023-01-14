@@ -178,8 +178,9 @@ namespace User_Service.Services
         {
             var patientGroup = GetPatientGroupByIdandTenant(patientGroupId, tenantId);
 
-            var userModel = _userService.GetUser(tenantId, userId);
-            _unitOfWork.PatientGroups.RemoveUser(patientGroup, userModel);
+            var user = _userService.GetUser(tenantId, userId);
+            
+            _unitOfWork.PatientGroups.RemoveUser(patientGroup, user);
             _unitOfWork.Complete();
         }
 
