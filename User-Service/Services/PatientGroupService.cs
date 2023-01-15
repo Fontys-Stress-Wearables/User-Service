@@ -63,31 +63,16 @@ namespace User_Service.Services
 
         public List<User> GetAllPatientsInPatientGroup(string patientGroupId, string tenantId)
         {
-            List<User> patientsInPatientGroup = new List<User>();
             var patientGroup = GetPatientGroupByIdAndTenant(patientGroupId, tenantId);
-            foreach (var user in patientGroup.Users)
-            {
-                if(user.Role == "Patient")
-                {
-                    patientsInPatientGroup.Add(user);
-                }
-            }
-            return patientsInPatientGroup;
+            
+            return patientGroup.Users.Where(user => user.Role == "Patient").ToList();
         }
 
         public List<User> GetAllCaregiversInPatientGroup(string patientGroupId, string tenantId)
         {
-            List<User> caregiversInPatientGroup = new List<User>();
             var patientGroup = GetPatientGroupByIdAndTenant(patientGroupId, tenantId);
-            
-            foreach (var user in patientGroup.Users)
-            {
-                if (user.Role == "Caregiver")
-                {
-                    caregiversInPatientGroup.Add(user);
-                }
-            }
-            return caregiversInPatientGroup;
+
+            return patientGroup.Users.Where(user => user.Role == "Caregiver").ToList();
         }
 
         public async Task AddUserToPatientGroup(string patientGroupId, string userId, string tenantId)
