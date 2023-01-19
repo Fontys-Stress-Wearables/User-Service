@@ -7,7 +7,7 @@ namespace User_Service.Interfaces.IServices
         public void AddUser(User user);
 
         public IEnumerable<User> GetAll(string tenantId);
-
+        public IEnumerable<User> GetAllPatients(string tenantId);
         public User GetUser(string tenantId, string id);
 
         public Task<User> GetCaregiver(string tenantId, string id);

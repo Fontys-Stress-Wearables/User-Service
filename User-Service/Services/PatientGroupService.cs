@@ -1,5 +1,4 @@
-﻿using Microsoft.Graph;
-using User_Service.Exceptions;
+﻿using User_Service.Exceptions;
 using User_Service.Interfaces;
 using User_Service.Interfaces.IServices;
 using User_Service.Models;
@@ -19,7 +18,7 @@ namespace User_Service.Services
             _userService = userService;
         }
 
-        public PatientGroup GetPatientGroupByIdandTenant(string patientGroupId, string tenantId)
+        public PatientGroup GetPatientGroupByIdAndTenant(string patientGroupId, string tenantId)
         {
             var patientGroup = _unitOfWork.PatientGroups.GetByIdAndTenant(patientGroupId, tenantId);
 
@@ -64,35 +63,21 @@ namespace User_Service.Services
 
         public List<User> GetAllPatientsInPatientGroup(string patientGroupId, string tenantId)
         {
-            List<User> patientsInPatientGroup = new List<User>();
-            var patientGroup = GetPatientGroupByIdandTenant(patientGroupId, tenantId);
-            foreach (var item in patientGroup.Users)
-            {
-                if(item.Role == "Patient")
-                {
-                    patientsInPatientGroup.Add(item);
-                }
-            }
-            return patientsInPatientGroup;
+            var patientGroup = GetPatientGroupByIdAndTenant(patientGroupId, tenantId);
+            
+            return patientGroup.Users.Where(user => user.Role == "Patient").ToList();
         }
 
         public List<User> GetAllCaregiversInPatientGroup(string patientGroupId, string tenantId)
         {
-            List<User> caregiversInPatientGroup = new List<User>();
-            var patientGroup = GetPatientGroupByIdandTenant(patientGroupId, tenantId);
-            foreach (var item in patientGroup.Users)
-            {
-                if (item.Role == "Caregiver")
-                {
-                    caregiversInPatientGroup.Add(item);
-                }
-            }
-            return caregiversInPatientGroup;
+            var patientGroup = GetPatientGroupByIdAndTenant(patientGroupId, tenantId);
+
+            return patientGroup.Users.Where(user => user.Role == "Caregiver").ToList();
         }
 
         public async Task AddUserToPatientGroup(string patientGroupId, string userId, string tenantId)
         {
-            var patientGroup = GetPatientGroupByIdandTenant(patientGroupId, tenantId);
+            var patientGroup = GetPatientGroupByIdAndTenant(patientGroupId, tenantId);
 
 
             var patient = _userService.GetUser(tenantId, userId);
@@ -177,10 +162,11 @@ namespace User_Service.Services
 
         public void RemoveUserFromPatientGroup(string patientGroupId, string userId, string tenantId)
         {
-            var patientGroup = GetPatientGroupByIdandTenant(patientGroupId, tenantId);
+            var patientGroup = GetPatientGroupByIdAndTenant(patientGroupId, tenantId);
 
-            var userModel = _userService.GetUser(tenantId, userId);
-            _unitOfWork.PatientGroups.RemoveUser(patientGroup, userModel);
+            var user = _userService.GetUser(tenantId, userId);
+            
+            _unitOfWork.PatientGroups.RemoveUser(patientGroup, user);
             _unitOfWork.Complete();
         }
 

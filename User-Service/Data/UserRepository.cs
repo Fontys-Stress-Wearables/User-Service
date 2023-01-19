@@ -16,7 +16,11 @@ namespace User_Service.Data
         {
             return _context.Set<User>().Where(x => x.Organisation.Id == tenantId).ToList();
         }
-
+        
+        public IEnumerable<User> GetAllPatientsByTenant(string tenantId)
+        {
+            return _context.Set<User>().Where(x => x.Organisation.Id == tenantId && x.Role == "Patient").ToList();
+        }
 
         public User GetByIdAndTenant(string tenantId, string patientId)
         {

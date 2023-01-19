@@ -37,10 +37,10 @@ namespace User_Service.Controllers
         }
 
         [Authorize(Roles = "Organization.Admin, Organization.Caregiver")]
-        [HttpGet("{patientGroupID}")]
-        public ActionResult<ReadPatientGroupDto> GetPatientGroupById(string patientGroupID)
+        [HttpGet("{patientGroupId}")]
+        public ActionResult<ReadPatientGroupDto> GetPatientGroupById(string patientGroupId)
         {
-            var patientGroup = _patientGroupService.GetPatientGroupByIdandTenant(patientGroupID, httpContextAccessor.HttpContext.User.GetTenantId());
+            var patientGroup = _patientGroupService.GetPatientGroupByIdAndTenant(patientGroupId, httpContextAccessor.HttpContext.User.GetTenantId());
 
             if (patientGroup is null)
             {
@@ -51,10 +51,10 @@ namespace User_Service.Controllers
         }
 
         [Authorize(Roles = "Organization.Admin, Organization.Caregiver")]
-        [HttpGet("{patientGroupID}/patients")]
-        public ActionResult<IEnumerable<ReadUserDto>> GetAllPatientsInPatientGroup(string patientGroupID)
+        [HttpGet("{patientGroupId}/patients")]
+        public ActionResult<IEnumerable<ReadUserDto>> GetAllPatientsInPatientGroup(string patientGroupId)
         {
-            var usersInPatientGroup = _patientGroupService.GetAllPatientsInPatientGroup(patientGroupID, httpContextAccessor.HttpContext.User.GetTenantId());
+            var usersInPatientGroup = _patientGroupService.GetAllPatientsInPatientGroup(patientGroupId, httpContextAccessor.HttpContext.User.GetTenantId());
 
             if (usersInPatientGroup is null)
             {
@@ -66,10 +66,10 @@ namespace User_Service.Controllers
         }
 
         [Authorize(Roles = "Organization.Admin, Organization.Caregiver")]
-        [HttpGet("{patientGroupID}/caregivers")]
-        public ActionResult<IEnumerable<ReadUserDto>> GetAllCaregiversInPatientGroup(string patientGroupID)
+        [HttpGet("{patientGroupId}/caregivers")]
+        public ActionResult<IEnumerable<ReadUserDto>> GetAllCaregiversInPatientGroup(string patientGroupId)
         {
-            var usersInPatientGroup = _patientGroupService.GetAllCaregiversInPatientGroup(patientGroupID, httpContextAccessor.HttpContext.User.GetTenantId());
+            var usersInPatientGroup = _patientGroupService.GetAllCaregiversInPatientGroup(patientGroupId, httpContextAccessor.HttpContext.User.GetTenantId());
 
             if (usersInPatientGroup is null)
             {
@@ -86,14 +86,14 @@ namespace User_Service.Controllers
         {
             var patientGroup = _patientGroupService.Create(createPatientGroupDto.GroupName, createPatientGroupDto.Description, httpContextAccessor.HttpContext.User.GetTenantId()!);
             
-            return CreatedAtAction(nameof(GetPatientGroupById), new { patientGroupID = patientGroup.Id }, $"{patientGroup.GroupName} Added");
+            return CreatedAtAction(nameof(GetPatientGroupById), new { patientGroupId = patientGroup.Id }, patientGroup);
         }
 
         [Authorize(Roles = "Organization.Admin")]
-        [HttpPost("{patientGroupID}/user")]
-        public async Task PostUserToPatientGroup(string patientGroupID, [FromBody] string userId )
+        [HttpPost("{patientGroupId}/user")]
+        public async Task PostUserToPatientGroup(string patientGroupId, [FromBody] string userId )
         {
-            await _patientGroupService.AddUserToPatientGroup(patientGroupID, userId, httpContextAccessor.HttpContext.User.GetTenantId()!);
+            await _patientGroupService.AddUserToPatientGroup(patientGroupId, userId, httpContextAccessor.HttpContext.User.GetTenantId()!);
         }
 
 
@@ -137,7 +137,7 @@ namespace User_Service.Controllers
 
         [Authorize(Roles = "Organization.Admin")]
         [HttpDelete("{groupId}/user")]
-        public void RemovePatientFromPatientGroup(string groupId, [FromBody] string userId)
+        public void RemoveUserFromPatientGroup(string groupId, [FromBody] string userId)
         {
             _patientGroupService.RemoveUserFromPatientGroup(groupId, userId, httpContextAccessor.HttpContext.User.GetTenantId()!);
         }

@@ -4,7 +4,7 @@ namespace User_Service.Interfaces.IServices
 {
     public interface IPatientGroupService
     {
-        public PatientGroup GetPatientGroupByIdandTenant(string patientGroupId, string tenantId);
+        public PatientGroup GetPatientGroupByIdAndTenant(string patientGroupId, string tenantId);
         public IEnumerable<PatientGroup> GetAll(string tenantId);
         public PatientGroup Update(string patientGroupId, string? name, string? description, string tenantId);
         public PatientGroup Create(string name, string? description, string tenantId);

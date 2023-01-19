@@ -51,14 +51,18 @@ namespace User_Service.Services
         {
             return _unitOfWork.Users.GetAllByTenant(tenantId);
         }
+        
+        public IEnumerable<User> GetAllPatients(string tenantId)
+        {
+            return _unitOfWork.Users.GetAllPatientsByTenant(tenantId);
+        }
 
         public User GetUser(string tenantId, string id)
         {
             var user = _unitOfWork.Users.GetByIdAndTenant(tenantId, id);
 
-            if (user == null || user.Role != "Patient")
+            if (user == null)
             {
-                return null;
                 throw new NotFoundException($"User with id '{id}' doesn't exist.");
             }
 
